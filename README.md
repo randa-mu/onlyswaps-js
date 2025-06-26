@@ -11,5 +11,6 @@ A Typescript client for making swaps using the OnlySwaps protocol and dcipher ne
 
 ## Lint
 To check the linting: `npm run lint`
+
 To fix any linter issues: `npm run lint:fix`
 
