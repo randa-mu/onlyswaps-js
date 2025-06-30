@@ -12,12 +12,12 @@ env:
 
 jobs:
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: ["randamu-self-hosted-default"]
     steps:
       - name: Checkout 🛎️
         uses: "actions/checkout@v4"
         with:
-          token: ${{ secrets.PRIVATE_SUBMODULE_READ }}
+          token: ${{ secrets.PAT_TOKEN }}
           submodules: recursive
           fetch-depth: 0
 
