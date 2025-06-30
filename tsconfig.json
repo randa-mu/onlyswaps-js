@@ -17,12 +17,14 @@
     "isolatedModules": false,
     "types": [
       "node"
-    ]
+    ],
+    "paths": {
+      "@/solidity/*": ["./onlysubs-solidity/out/*"],
+    }
   },
   "include": [
     "src/**/*"
   ],
-  "exclude": ["src/generated/**/*"],
   "compileOnSave": true
 }
 
