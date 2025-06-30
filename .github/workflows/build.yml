@@ -4,6 +4,9 @@ on:
     branches: [master]
   pull_request:
 
+env:
+  FURNACE_PRIVATE_KEY = ${{ secrets.FURNACE_PRIVATE_KEY }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
