@@ -46,7 +46,7 @@
     "build": "npm run clean && npm run build:solidity && npm run build:esm && npm run build:cjs && npm run build:types",
     "build:esm": "esbuild src/index.ts --bundle --platform=browser --format=esm --outdir=dist/esm --sourcemap --target=es2020 --out-extension:.js=.mjs",
     "build:cjs": "esbuild src/index.ts --bundle --platform=node --format=cjs --outdir=dist/cjs --sourcemap --target=es2020 --out-extension:.js=.cjs",
-    "build:solidity": "(cd onlysubs-solidity && npm run build)",
+    "build:solidity": "(cd onlysubs-solidity && npm ci && npm run build)",
     "build:types": "tsc --emitDeclarationOnly --outDir dist",
     "clean": "rm -rf dist",
     "lint": "eslint src",
