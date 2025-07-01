@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: 22.9.0
 
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
       - name: Install dependencies
         run: npm ci
       
