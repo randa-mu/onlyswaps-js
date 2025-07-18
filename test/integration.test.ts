@@ -16,9 +16,9 @@ const walletClient = createWalletClient({
     account,
 })
 
-const RUSD_ADDRESS = "0x46D346f8d9582f8963110108A7988B1a0bB3668D"
+const RUSD_ADDRESS = "0x21C07ff0A3Fb809E5919d5Bef0186D30EF48d660"
 const ONLYSWAPS_ROUTER_ADDRESS = "0xD10fdc7B6E049Ee482a1C202dB996eC4fFA36370"
-const MY_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+const MY_ADDRESS = "0xB1a49d61b8D77d270cdA4ced5D6E5fcEf53708dC"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
     const rusd = new ViemRUSDClient(
