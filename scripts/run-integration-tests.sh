@@ -26,5 +26,7 @@ if [ $EXIT_CODE -ne "0" ]; then
 fi
 
 echo "[+] tearing down anvil instances"
+docker compose -f docker-compose.integration.yml logs
 docker compose -f docker-compose.integration.yml down
+
 exit $EXIT_CODE
