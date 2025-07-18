@@ -4,18 +4,20 @@ import {
     parseAbi,
     parseEventLogs,
     PublicClient,
-    WalletClient
+    WalletClient,
+    parseEther
 } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
+import { RUSD, ViemRUSDClient } from "./rusd"
+import { throwOnError } from "./eth"
 import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
-
 
 const DEFAULT_ABI: Abi = RouterJson.abi as Abi
 export type SwapRequest = {
     recipient: `0x${string}`
     tokenAddress: `0x${string}`
-    amount: bigint
-    fee: bigint
+    amount: bigint // the amount of stablecoin in ether, e.g. 100n == 100 USD
+    fee: bigint // the fee amount in stablecoin expressed as ether, e.g. 1n == 1 USD
     destinationChainId: bigint
 }
 
@@ -61,26 +63,40 @@ export class OnlySwapsViemClient implements OnlySwaps {
         return Promise.resolve(1n)
     }
 
-    async swap(request: SwapRequest): Promise<SwapResponse> {
-        const hash = await this.walletClient.writeContract({
+    async swap(request: SwapRequest, client?: RUSD): Promise<SwapResponse> {
+        // first we approve the spend of RUSD for swapping
+        const rusd = client ?? new ViemRUSDClient(
+            this.account,
+            request.tokenAddress,
+            this.publicClient,
+            this.walletClient,
+        )
+        await rusd.approveSpend(this.contractAddress, parseEther(request.amount.toString(10)))
+
+        const swapParams = {
+            functionName: "requestCrossChainSwap",
             address: this.contractAddress,
             abi: this.abi,
-            functionName: "requestCrossChainSwap",
             args: [request.tokenAddress, request.amount, request.fee, request.destinationChainId, request.recipient],
             account: this.account,
             chain: this.walletClient.chain,
-        })
+        }
+        const hash = await this.walletClient.writeContract(swapParams)
 
         const receipt = await waitForTransactionReceipt(this.walletClient, { hash })
+        await throwOnError(receipt, this.abi, this.publicClient, swapParams)
         const eventAbi = "event SwapRequested(bytes32 indexed requestId, bytes message)"
         const events = parseEventLogs({
             abi: parseAbi([eventAbi]),
             eventName: "SwapRequested",
             logs: receipt.logs
         })
-        const { args } = events[0]
-        const { requestId } = args
-        return { requestId }
+
+        if (events.length === 0) {
+            throw new Error("unable to get requestId for swap")
+        }
+
+        return { requestId: events[0].args.requestId }
     }
 
     async updateFee(requestId: `0x${string}`, newFee: bigint): Promise<void> {

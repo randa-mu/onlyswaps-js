@@ -1,12 +1,16 @@
 import { Abi, Address, PublicClient, WalletClient } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
 import ERC20Token from "../onlysubs-solidity/out/ERC20Token.sol/ERC20Token.json"
+import { throwOnError } from "./eth"
 
 const DEFAULT_ABI: Abi = ERC20Token.abi as Abi
 
 export interface RUSD {
     mint(address: Address): Promise<void>
+
     balanceOf(address: Address): Promise<bigint>
+
+    approveSpend(address: Address, amount: bigint): Promise<void>
 }
 
 const DEFAULT_WITHDRAWAL_AMOUNT = 1_000_000_000_000_000_000n
@@ -43,6 +47,21 @@ export class ViemRUSDClient implements RUSD {
             args: [address]
         })
         return response as bigint
+    }
+
+    async approveSpend(address: Address, amount: bigint): Promise<void> {
+        const approvalParams = {
+            functionName: "approve",
+            abi: DEFAULT_ABI,
+            address: this.contractAddr,
+            account: this.account,
+            chain: this.walletClient.chain,
+            args: [address, amount]
+        }
+        const hash = await this.walletClient.writeContract(approvalParams)
+
+        const receipt = await waitForTransactionReceipt(this.walletClient, { hash })
+        await throwOnError(receipt, this.abi, this.publicClient, approvalParams)
     }
 
 }
