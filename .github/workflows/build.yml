@@ -19,7 +19,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           submodules: recursive
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Install nodejs 🔧
         uses: "actions/setup-node@v3"
