@@ -21,12 +21,13 @@ echo "[+] running the test suite"
 npm run test
 EXIT_CODE=$?;
 
+docker compose -f docker-compose.integration.yml logs anvil
+
 if [ $EXIT_CODE -ne "0" ]; then
   echo "[-] tests were unsuccessful :<"
 fi
 
 echo "[+] tearing down anvil instances"
-docker compose -f docker-compose.integration.yml logs
 docker compose -f docker-compose.integration.yml down
 
 exit $EXIT_CODE
