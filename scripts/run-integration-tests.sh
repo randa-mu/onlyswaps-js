@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# spins up two anvil instances using docker compose, deploys the
-# contracts to them, does a bit of a initialisation, and then runs
+# spins up an anvil instance using docker compose, deploys the
+# contracts to it, does a bit of a initialisation, and then runs
 # the javascript integration tests.
 # test failures don't exit immediately, they clean up the docker instances first
 
@@ -13,11 +13,9 @@ sleep 5;
 
 echo "[+] deploying the contracts"
 ./scripts/deploy-anvil.sh 1337
-./scripts/deploy-anvil.sh 1338
 
 echo "[+] running some initialisation for the contracts"
 ./scripts/enable-transfers.sh 1337 1338
-./scripts/enable-transfers.sh 1338 1337
 
 echo "[+] running the test suite"
 npm run test

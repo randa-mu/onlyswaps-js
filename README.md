@@ -8,7 +8,7 @@ A Typescript client for making swaps using the OnlySwaps protocol and dcipher ne
 
 ## Test
 In order to run integration tests, you can use the convenience bash script [./scripts/run-integration-tests.sh](./scripts/run-integration-tests.sh).
-This will spin up local anvil instances, deploy the contracts, initialise them, then run the tests.
+This will spin up a local anvil instance, deploy the contracts, initialise them, then run the tests.
 
 ## Lint
 To check the linting: `npm run lint`
