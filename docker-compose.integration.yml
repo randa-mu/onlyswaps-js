@@ -1,6 +1,6 @@
 services:
   anvil:
     image: ghcr.io/foundry-rs/foundry:latest
-    entrypoint: anvil --host 0.0.0.0 --port 1337 --chain-id 1337 --block-time 3
+    entrypoint: anvil --host 0.0.0.0 --port 31337 --chain-id 31337 --block-time 3
     ports:
-      - "1337:1337"
+      - "31337:31337"

@@ -4,21 +4,21 @@ import { privateKeyToAccount } from "viem/accounts"
 import { foundry } from "viem/chains"
 import { OnlySwapsViemClient, ViemRUSDClient } from "../src"
 
-const account = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
+const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
 const publicClient = createPublicClient({
-    chain: { ...foundry, id: 1337 },
-    transport: http("http://localhost:1337"),
+    chain: foundry,
+    transport: http("http://localhost:31337"),
 })
 
 const walletClient = createWalletClient({
-    chain: { ...foundry, id: 1337 },
-    transport: http("http://localhost:1337"),
+    chain: foundry,
+    transport: http("http://localhost:31337"),
     account,
 })
 
-const RUSD_ADDRESS = "0x21C07ff0A3Fb809E5919d5Bef0186D30EF48d660"
+const RUSD_ADDRESS = "0x46D346f8d9582f8963110108A7988B1a0bB3668D"
 const ONLYSWAPS_ROUTER_ADDRESS = "0xD10fdc7B6E049Ee482a1C202dB996eC4fFA36370"
-const MY_ADDRESS = "0xB1a49d61b8D77d270cdA4ced5D6E5fcEf53708dC"
+const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
     const rusd = new ViemRUSDClient(

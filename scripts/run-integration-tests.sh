@@ -12,16 +12,14 @@ docker compose -f docker-compose.integration.yml up -d;
 sleep 5;
 
 echo "[+] deploying the contracts"
-./scripts/deploy-anvil.sh 1337
+./scripts/deploy-anvil.sh 31337
 
 echo "[+] running some initialisation for the contracts"
-./scripts/enable-transfers.sh 1337 1338
+./scripts/enable-transfers.sh 31337 1338
 
 echo "[+] running the test suite"
 npm run test
 EXIT_CODE=$?;
-
-docker compose -f docker-compose.integration.yml logs anvil
 
 if [ $EXIT_CODE -ne "0" ]; then
   echo "[-] tests were unsuccessful :<"
