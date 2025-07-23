@@ -24,15 +24,15 @@
   "source": "src/index.ts",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
       "require": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/src/index.d.ts",
         "default": "./dist/cjs/index.cjs"
       },
       "import": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/src/index.d.ts",
         "default": "./dist/esm/index.mjs"
       }
     }
@@ -47,7 +47,7 @@
     "build:esm": "esbuild src/index.ts --bundle --platform=browser --format=esm --outdir=dist/esm --sourcemap --target=es2020 --out-extension:.js=.mjs",
     "build:cjs": "esbuild src/index.ts --bundle --platform=node --format=cjs --outdir=dist/cjs --sourcemap --target=es2020 --out-extension:.js=.cjs",
     "build:solidity": "(cd onlysubs-solidity && npm ci && npm run build)",
-    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "build:types": "tsc",
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint --fix",

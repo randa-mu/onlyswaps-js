@@ -5,8 +5,10 @@
     "moduleResolution": "bundler",
     "sourceMap": true,
     "declaration": true,
+    "stripInternal": true,
+    "composite": true,
+    "declarationDir": "./dist",
     "emitDeclarationOnly": true,
-    "outDir": "dist",
     "allowJs": true,
     "esModuleInterop": true,
     "strict": true,
@@ -17,13 +19,11 @@
     "isolatedModules": false,
     "types": [
       "node"
-    ],
-    "paths": {
-      "@/solidity/*": ["./onlysubs-solidity/out/*"],
-    }
+    ]
   },
   "include": [
-    "src/**/*"
+    "./src",
+    "./onlysubs-solidity/**/*"
   ],
   "compileOnSave": true
 }
