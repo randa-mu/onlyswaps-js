@@ -8,7 +8,7 @@ import {
     parseEther
 } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
-import { RUSD, ViemRUSDClient } from "./rusd"
+import { RUSD, RUSDViemClient } from "./rusd"
 import { throwOnError } from "./eth"
 import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
 
@@ -25,7 +25,7 @@ export type SwapResponse = {
     requestId: `0x${string}`
 }
 
-type TransferParams = {
+export type TransferParams = {
     sender: `0x${string}`,
     recipient: `0x${string}`,
     token: `0x${string}`,
@@ -65,7 +65,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
 
     async swap(request: SwapRequest, client?: RUSD): Promise<SwapResponse> {
         // first we approve the spend of RUSD for swapping
-        const rusd = client ?? new ViemRUSDClient(
+        const rusd = client ?? new RUSDViemClient(
             this.account,
             request.tokenAddress,
             this.publicClient,

@@ -2,7 +2,7 @@ import { expect, test } from "@jest/globals"
 import { createPublicClient, createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { foundry } from "viem/chains"
-import { OnlySwapsViemClient, ViemRUSDClient } from "../src"
+import { OnlySwapsViemClient, RUSDViemClient } from "../src"
 
 const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
 const publicClient = createPublicClient({
@@ -21,7 +21,7 @@ const ONLYSWAPS_ROUTER_ADDRESS = "0xB1a49d61b8D77d270cdA4ced5D6E5fcEf53708dC"
 const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
-    const rusd = new ViemRUSDClient(
+    const rusd = new RUSDViemClient(
         MY_ADDRESS,
         RUSD_ADDRESS,
         publicClient,

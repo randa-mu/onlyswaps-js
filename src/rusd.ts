@@ -15,7 +15,7 @@ export interface RUSD {
 
 const DEFAULT_WITHDRAWAL_AMOUNT = 1_000_000_000_000_000_000n
 
-export class ViemRUSDClient implements RUSD {
+export class RUSDViemClient implements RUSD {
 
     constructor(
         private account: Address,
