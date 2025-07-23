@@ -6,7 +6,6 @@
     "sourceMap": true,
     "declaration": true,
     "stripInternal": true,
-    "composite": true,
     "declarationDir": "./dist",
     "emitDeclarationOnly": true,
     "allowJs": true,
@@ -23,7 +22,7 @@
   },
   "include": [
     "./src",
-    "./onlysubs-solidity/**/*"
+    "./onlysubs-solidity/out/**/*"
   ],
   "compileOnSave": true
 }
