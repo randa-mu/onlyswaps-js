@@ -10,43 +10,7 @@ import {
 import { waitForTransactionReceipt } from "viem/actions"
 import { RUSD, RUSDViemClient } from "./rusd"
 import { throwOnError } from "./eth"
-import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
-
-const DEFAULT_ABI: Abi = RouterJson.abi as Abi
-export type SwapRequest = {
-    recipient: `0x${string}`
-    tokenAddress: `0x${string}`
-    amount: bigint // the amount of stablecoin in ether, e.g. 100n == 100 USD
-    fee: bigint // the fee amount in stablecoin expressed as ether, e.g. 1n == 1 USD
-    destinationChainId: bigint
-}
-
-export type SwapResponse = {
-    requestId: `0x${string}`
-}
-
-export type TransferParams = {
-    sender: `0x${string}`,
-    recipient: `0x${string}`,
-    token: `0x${string}`,
-    amount: bigint,
-    srcChainId: bigint,
-    dstChainId: bigint,
-    swapFee: bigint,
-    solverFee: bigint,
-    nonce: bigint,
-    executed: boolean,
-}
-
-export interface OnlySwaps {
-    swap(options: SwapRequest): Promise<SwapResponse>
-
-    updateFee(requestId: `0x${string}`, newFee: bigint): Promise<void>
-
-    fetchRecommendedFee(tokenAddress: `0x${string}`, sourceChainId: bigint, destinationChainId: bigint): Promise<bigint>
-
-    fetchStatus(requestId: `0x${string}`): Promise<TransferParams>
-}
+import { DEFAULT_ABI, OnlySwaps, SwapRequest, SwapResponse, TransferParams, TransferReceipt } from "./model"
 
 export class OnlySwapsViemClient implements OnlySwaps {
     constructor(
@@ -119,5 +83,15 @@ export class OnlySwapsViemClient implements OnlySwaps {
             args: [requestId],
         })
         return response as TransferParams
+    }
+
+    async fetchReceipt(requestId: `0x${string}`): Promise<TransferReceipt> {
+        const response = await this.publicClient.readContract({
+            address: this.contractAddress,
+            abi: this.abi,
+            functionName: "getReceipt",
+            args: [requestId],
+        })
+        return response as TransferReceipt
     }
 }
