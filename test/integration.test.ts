@@ -55,3 +55,14 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     expect(statusAfter.solverFee).toEqual(2n)
 })
 
+test("can fetch suggested fee", async () => {
+    const onlyswaps = new OnlySwapsViemClient(
+        MY_ADDRESS,
+        ONLYSWAPS_ROUTER_ADDRESS,
+        publicClient,
+        walletClient
+    )
+
+    const fee = await onlyswaps.fetchRecommendedFee("0x00000", 1n, 8453n, 43114n)
+    expect(fee).toBeGreaterThan(0n)
+})

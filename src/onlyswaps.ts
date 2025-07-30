@@ -22,9 +22,23 @@ export class OnlySwapsViemClient implements OnlySwaps {
     ) {
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fetchRecommendedFee(_tokenAddress: `0x${string}`, _sourceChainId: bigint, _destinationChainId: bigint): Promise<bigint> {
-        return Promise.resolve(1n)
+    async fetchRecommendedFee(tokenAddress: `0x${string}`, amount: bigint, srcChainId: bigint, destChainId: bigint): Promise<bigint> {
+        const res = await fetch("https://fees.dcipher.network/fees", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token: tokenAddress,
+                amount: Number(amount),
+                src_chain_id: Number(srcChainId),
+                dest_chain_id: Number(destChainId),
+            })
+        })
+        if (!res.ok) {
+            console.error("Failed to fetch recommended fees", res.statusText)
+            throw new Error("failed to fetch recommended fee")
+        }
+        const { suggested_fee } = await res.json()
+        return Promise.resolve(BigInt(suggested_fee))
     }
 
     async swap(request: SwapRequest, client?: RUSD): Promise<SwapResponse> {

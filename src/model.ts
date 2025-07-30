@@ -47,7 +47,7 @@ export interface OnlySwaps {
 
     updateFee(requestId: `0x${string}`, newFee: bigint): Promise<void>
 
-    fetchRecommendedFee(tokenAddress: `0x${string}`, sourceChainId: bigint, destinationChainId: bigint): Promise<bigint>
+    fetchRecommendedFee(tokenAddress: `0x${string}`, amount: bigint, srcChainId: bigint, destChainId: bigint): Promise<bigint>
 
     // used to track the status on the sourceChain
     fetchStatus(requestId: `0x${string}`): Promise<TransferParams>
