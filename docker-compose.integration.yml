@@ -5,4 +5,4 @@ services:
     volumes:
       - "./docker:/mnt"
     ports:
-      - "31337:31337"
+      - "127.0.0.1:31337:31337"

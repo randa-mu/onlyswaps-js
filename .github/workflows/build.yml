@@ -42,4 +42,4 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker-compose -f docker-compose.integration.yml down
+        run: docker compose -f docker-compose.integration.yml down
