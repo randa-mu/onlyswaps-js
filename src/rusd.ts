@@ -1,9 +1,9 @@
 import { Abi, Address, PublicClient, WalletClient } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
-import ERC20Token from "../onlysubs-solidity/out/ERC20Token.sol/ERC20Token.json"
+import ERC20FaucetToken from "../onlysubs-solidity/out/ERC20FaucetToken.sol/ERC20FaucetToken.json"
 import { throwOnError } from "./eth"
 
-const DEFAULT_ABI: Abi = ERC20Token.abi as Abi
+const DEFAULT_ABI: Abi = ERC20FaucetToken.abi as Abi
 
 export interface RUSD {
     mint(address: Address): Promise<void>
@@ -12,8 +12,6 @@ export interface RUSD {
 
     approveSpend(address: Address, amount: bigint): Promise<void>
 }
-
-const DEFAULT_WITHDRAWAL_AMOUNT = 1_000_000_000_000_000_000n
 
 export class RUSDViemClient implements RUSD {
 
@@ -26,22 +24,22 @@ export class RUSDViemClient implements RUSD {
     ) {
     }
 
-    async mint(address: Address): Promise<void> {
+    async mint(): Promise<void> {
         const hash = await this.walletClient.writeContract({
             functionName: "mint",
             abi: this.abi,
             address: this.contractAddr,
             account: this.account,
             chain: this.walletClient.chain,
-            args: [address, DEFAULT_WITHDRAWAL_AMOUNT],
+            args: [],
         })
 
-        await waitForTransactionReceipt(this.walletClient, { hash })
+        await waitForTransactionReceipt(this.walletClient, { hash  })
     }
 
     async balanceOf(address: Address): Promise<bigint> {
         const response = await this.publicClient.readContract({
-            abi: DEFAULT_ABI,
+            abi: this.abi,
             address: this.contractAddr,
             functionName: "balanceOf",
             args: [address]
@@ -52,7 +50,7 @@ export class RUSDViemClient implements RUSD {
     async approveSpend(address: Address, amount: bigint): Promise<void> {
         const approvalParams = {
             functionName: "approve",
-            abi: DEFAULT_ABI,
+            abi: this.abi,
             address: this.contractAddr,
             account: this.account,
             chain: this.walletClient.chain,

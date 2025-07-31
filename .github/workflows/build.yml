@@ -33,6 +33,13 @@ jobs:
       
       - name: Build
         run: npm run build
-        
+
+      - name: Start docker containers
+        run: docker compose -f docker-compose.integration.yml up -d
+
       - name: Test
-        run: ./scripts/run-integration-tests.sh
+        run: npm run test
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose -f docker-compose.integration.yml down
