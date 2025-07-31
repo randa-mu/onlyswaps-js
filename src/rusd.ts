@@ -6,7 +6,7 @@ import { throwOnError } from "./eth"
 const DEFAULT_ABI: Abi = ERC20FaucetToken.abi as Abi
 
 export interface RUSD {
-    mint(address: Address): Promise<void>
+    mint(): Promise<void>
 
     balanceOf(address: Address): Promise<bigint>
 
