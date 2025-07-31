@@ -34,7 +34,7 @@ export class RUSDViemClient implements RUSD {
             args: [],
         })
 
-        await waitForTransactionReceipt(this.walletClient, { hash  })
+        await waitForTransactionReceipt(this.walletClient, { hash })
     }
 
     async balanceOf(address: Address): Promise<bigint> {
@@ -62,4 +62,41 @@ export class RUSDViemClient implements RUSD {
         await throwOnError(receipt, this.abi, this.publicClient, approvalParams)
     }
 
+}
+
+const RUSD_FRACTION_DIGITS = 6
+export function rusdToString(value: bigint, decimals: number = 2): string {
+    if (decimals > RUSD_FRACTION_DIGITS) {
+        decimals = RUSD_FRACTION_DIGITS
+    }
+
+    const negative = value < 0n
+    const absValue = negative ? -value : value
+
+    const factor = 10n ** BigInt(RUSD_FRACTION_DIGITS)
+    const integerPart = absValue / factor
+    const decimalPart = absValue % factor
+
+    const decimalStr = decimalPart.toString().padStart(6, "0").slice(0, decimals)
+
+    return decimals === 0
+        ? `${negative ? "-" : ""}${integerPart.toString()}`
+        : `${negative ? "-" : ""}${integerPart.toString()}.${decimalStr}`
+}
+
+export function rusdFromString(input: string): bigint {
+    const regex = /^\s*([+-]?\d+)(?:\.(\d*))?\s*$/;
+    const match = input.match(regex)
+    if (!match) {
+        throw new Error("cannot parse string as RUSD value")
+    }
+
+    const integerPart = match[1]
+    const decimalPart = (match[2] || "").padEnd(RUSD_FRACTION_DIGITS, "0").slice(0, RUSD_FRACTION_DIGITS)
+    const combined = integerPart + decimalPart
+    return BigInt(combined)
+}
+
+export function rusdFromNumber(input: number): bigint {
+    return BigInt(input.toFixed(RUSD_FRACTION_DIGITS).replace(".", ""))
 }
