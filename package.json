@@ -69,6 +69,8 @@
     "typescript-eslint": "^8.35.0"
   },
   "dependencies": {
+    "@types/decimal.js": "^0.0.32",
+    "decimal.js": "^10.6.0",
     "viem": "^2.33.0"
   }
 }

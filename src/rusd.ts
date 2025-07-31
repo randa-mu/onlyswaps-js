@@ -2,6 +2,7 @@ import { Abi, Address, PublicClient, WalletClient } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
 import ERC20FaucetToken from "../onlysubs-solidity/out/ERC20FaucetToken.sol/ERC20FaucetToken.json"
 import { throwOnError } from "./eth"
+import Decimal from "decimal.js"
 
 const DEFAULT_ABI: Abi = ERC20FaucetToken.abi as Abi
 
@@ -64,7 +65,7 @@ export class RUSDViemClient implements RUSD {
 
 }
 
-const RUSD_FRACTION_DIGITS = 6
+const RUSD_FRACTION_DIGITS = 18
 export function rusdToString(value: bigint, decimals: number = 2): string {
     if (decimals > RUSD_FRACTION_DIGITS) {
         decimals = RUSD_FRACTION_DIGITS
@@ -77,7 +78,9 @@ export function rusdToString(value: bigint, decimals: number = 2): string {
     const integerPart = absValue / factor
     const decimalPart = absValue % factor
 
-    const decimalStr = decimalPart.toString().padStart(6, "0").slice(0, decimals)
+    const decimalStr = decimalPart.toString()
+        .padStart(RUSD_FRACTION_DIGITS, "0")
+        .slice(0, decimals)
 
     return decimals === 0
         ? `${negative ? "-" : ""}${integerPart.toString()}`
@@ -98,5 +101,7 @@ export function rusdFromString(input: string): bigint {
 }
 
 export function rusdFromNumber(input: number): bigint {
-    return BigInt(input.toFixed(RUSD_FRACTION_DIGITS).replace(".", ""))
+    const d = new Decimal(input)
+    const scaled = d.mul(new Decimal(10).pow(RUSD_FRACTION_DIGITS))
+    return BigInt(scaled.round().toFixed(0))
 }
