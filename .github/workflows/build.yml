@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: Start docker containers
-        run: docker compose -f docker-compose.integration.yml up -d
+        run: docker compose -f docker-compose.integration.yml up -d; sleep 5
 
       - name: Test
         run: npm run test
