@@ -32,21 +32,7 @@ jobs:
         run: npm run build
 
       - name: Start docker containers
-        run: docker compose -f docker-compose.integration.yml up -d
-
-      - name: Wait for Anvil to be ready
-        run: |
-          docker ps -a
-          for i in {1..5}; do
-            if curl -s http://localhost:31337 -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' -H "Content-Type: application/json" | grep -q '"result"'; then
-              echo "Anvil is up!"
-              break
-            fi
-            echo "Waiting for Anvil..."
-            sleep 2
-          done
-          docker compose -f docker-compose.integration.yml logs anvil
-          docker ps -a
+        run: docker compose -f docker-compose.integration.yml up -d; sleep 3;
 
       - name: Test
         run: npm run test
