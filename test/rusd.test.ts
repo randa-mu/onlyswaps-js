@@ -1,5 +1,6 @@
 import { expect, describe, it } from "@jest/globals"
 import { rusdToString, rusdFromString, rusdFromNumber } from "../src"
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 
 describe("rusd (18 decimal places)", () => {
     describe("rusdToString", () => {
