@@ -7,8 +7,24 @@ A Typescript client for making swaps using the OnlySwaps protocol and dcipher ne
 `npm run build`
 
 ## Test
-In order to run integration tests, you can use the convenience bash script [./scripts/run-integration-tests.sh](./scripts/run-integration-tests.sh).
-This will spin up a local anvil instance, deploy the contracts, initialise them, then run the tests.
+To run integration tests, you must have **Docker** installed and available in your system's `PATH`.
+
+Check if Docker is installed by running:
+
+```bash
+docker --version
+```
+
+If this command fails, [install Docker](https://docs.docker.com/get-started/get-docker/) before proceeding.
+
+You can run the integration tests using the convenience bash script: [./scripts/run-integration-tests.sh](./scripts/run-integration-tests.sh).
+
+This script will:
+
+- Spin up a local **Anvil** instance using Docker.
+- Deploy the contracts.
+- Initialize the contracts.
+- Run the integration tests.
 
 ## Lint
 To check the linting: `npm run lint`
