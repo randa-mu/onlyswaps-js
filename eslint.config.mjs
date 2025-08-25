@@ -6,5 +6,12 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
-    {"ignores": ["src/generated/**", "index.js"]}
+    {
+        "ignores": [
+            "src/generated/**", 
+            "index.js", 
+            "dist/**",
+            "onlysubs-solidity/**"
+        ]
+    }
 );
