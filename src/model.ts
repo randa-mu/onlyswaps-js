@@ -34,6 +34,7 @@ export type TransferParams = {
 export type TransferReceipt = {
     requestId: `0x${string}`
     recipient: `0x${string}`
+    token: `0x${string}`
     srcChainId: bigint
     // `fulfilled` is true when the solver has completed the transfer
     // but it may or may not have been verified by the dcipher network
