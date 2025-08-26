@@ -18,4 +18,4 @@ export BLS_PUBLIC_KEY_Y0=1140160117017209047279547947986422217212370518864446912
 export BLS_PUBLIC_KEY_Y1=8044854403167346152897273335539146380878155193886184396711544300199836788154
 
 cd $SCRIPT_DIR/../onlysubs-solidity
-forge script script/DeployAllContracts.s.sol --broadcast --rpc-url $RPC_URL --private-key $PRIVATE_KEY --force
+forge script script/onlyswaps/DeployAllContracts.s.sol:DeployAllContracts --broadcast --rpc-url $RPC_URL --private-key $PRIVATE_KEY --force
