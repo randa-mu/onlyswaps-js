@@ -106,7 +106,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
             functionName: "getReceipt",
             args: [requestId],
         })
-        const [, srcChainId, token, fulfilled, solver, recipient, amountOut, fulfilledAt] = response as TransferReceiptReturnType
+        const [, srcChainId, token, fulfilled, solver, recipient, amount, fulfilledAt] = response as TransferReceiptReturnType
         return {
             requestId,
             srcChainId,
@@ -114,7 +114,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
             solver,
             recipient,
             token,
-            amountOut,
+            amount,
             fulfilledAt
         }
     }
@@ -130,6 +130,6 @@ type TransferReceiptReturnType = [
     fulfilled: boolean,
     solver: `0x${string}`,
     recipient: `0x${string}`,
-    amountOut: bigint,
+    amount: bigint,
     fulfilledAt: bigint,
 ]
