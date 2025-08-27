@@ -40,7 +40,7 @@ export type TransferReceipt = {
     // but it may or may not have been verified by the dcipher network
     fulfilled: boolean
     solver: `0x${string}`
-    amountOut: bigint
+    amount: bigint
     fulfilledAt: bigint
 }
 
