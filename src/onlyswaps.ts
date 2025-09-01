@@ -10,7 +10,7 @@ import {
 import { waitForTransactionReceipt } from "viem/actions"
 import { RUSD, RUSDViemClient } from "./rusd"
 import { throwOnError } from "./eth"
-import { DEFAULT_ABI, OnlySwaps, SwapRequest, SwapResponse, TransferParams, TransferReceipt } from "./model"
+import { DEFAULT_ABI, OnlySwaps, SwapRequest, SwapResponse, SwapRequestParameters, SwapRequestReceipt } from "./model"
 
 export class OnlySwapsViemClient implements OnlySwaps {
     constructor(
@@ -22,7 +22,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
     ) {
     }
 
-    async fetchRecommendedFee(tokenAddress: `0x${string}`, amount: bigint, srcChainId: bigint, destChainId: bigint): Promise<bigint> {
+    async fetchRecommendedFee(tokenAddress: `0x${string}`, amount: bigint, srcChainId: bigint, dstChainId: bigint): Promise<bigint> {
         const res = await fetch("https://fees.dcipher.network/fees", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -30,7 +30,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
                 token: tokenAddress,
                 amount: Number(amount),
                 src_chain_id: Number(srcChainId),
-                dest_chain_id: Number(destChainId),
+                dest_chain_id: Number(dstChainId),
             })
         })
         if (!res.ok) {
@@ -50,12 +50,12 @@ export class OnlySwapsViemClient implements OnlySwaps {
             this.walletClient,
         )
         await rusd.approveSpend(this.contractAddress, parseEther(request.amount.toString(10)))
-
         const swapParams = {
             functionName: "requestCrossChainSwap",
             address: this.contractAddress,
             abi: this.abi,
-            args: [request.tokenAddress, request.amount, request.fee, request.destinationChainId, request.recipient],
+            // right now, we only support the same token address on multiple chains
+            args: [request.tokenAddress, request.tokenAddress, request.amount, request.fee, request.destinationChainId, request.recipient],
             account: this.account,
             chain: this.walletClient.chain,
         }
@@ -63,7 +63,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
 
         const receipt = await waitForTransactionReceipt(this.walletClient, { hash })
         await throwOnError(receipt, this.abi, this.publicClient, swapParams)
-        const eventAbi = "event SwapRequested(bytes32 indexed requestId, bytes message)"
+        const eventAbi = "event SwapRequested(bytes32 indexed requestId, uint256 indexed srcChainId, uint256 indexed dstChainId)"
         const events = parseEventLogs({
             abi: parseAbi([eventAbi]),
             eventName: "SwapRequested",
@@ -83,39 +83,41 @@ export class OnlySwapsViemClient implements OnlySwaps {
             abi: this.abi,
             account: this.account,
             chain: this.walletClient.chain,
-            functionName: "updateFeesIfUnfulfilled",
+            functionName: "updateSolverFeesIfUnfulfilled",
             args: [requestId, newFee],
         })
         await waitForTransactionReceipt(this.walletClient, { hash })
     }
 
-    async fetchStatus(requestId: `0x${string}`): Promise<TransferParams> {
+    async fetchStatus(requestId: `0x${string}`): Promise<SwapRequestParameters> {
         const response = await this.publicClient.readContract({
             address: this.contractAddress,
             abi: this.abi,
-            functionName: "getTransferParameters",
+            functionName: "getSwapRequestParameters",
             args: [requestId],
         })
-        return response as TransferParams
+        return response as SwapRequestParameters
     }
 
-    async fetchReceipt(requestId: `0x${string}`): Promise<TransferReceipt> {
+    async fetchReceipt(requestId: `0x${string}`): Promise<SwapRequestReceipt> {
         const response = await this.publicClient.readContract({
             address: this.contractAddress,
             abi: this.abi,
-            functionName: "getReceipt",
+            functionName: "getSwapRequestReceipt",
             args: [requestId],
-        })
-        const [, srcChainId, token, fulfilled, solver, recipient, amount, fulfilledAt] = response as TransferReceiptReturnType
+        }) as TransferReceiptReturnType
+        const [, srcChainId, dstChainId, token, fulfilled, solver, recipient, amountOut, fulfilledAt] = response
+
         return {
             requestId,
             srcChainId,
+            dstChainId,
+            token,
             fulfilled,
             solver,
             recipient,
-            token,
-            amount,
-            fulfilledAt
+            amountOut,
+            fulfilledAt,
         }
     }
 }
@@ -124,12 +126,13 @@ export class OnlySwapsViemClient implements OnlySwaps {
 type TransferReceiptReturnType = [
     requestId: `0x${string}`,
     srcChainId: bigint,
+    dstChainId: bigint,
     token: `0x${string}`,
     // `fulfilled` is true when the solver has completed the transfer
     // but it may or may not have been verified by the dcipher network
     fulfilled: boolean,
     solver: `0x${string}`,
     recipient: `0x${string}`,
-    amount: bigint,
+    amountOut: bigint,
     fulfilledAt: bigint,
 ]

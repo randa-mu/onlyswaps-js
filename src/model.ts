@@ -14,33 +14,34 @@ export type SwapResponse = {
     requestId: `0x${string}`
 }
 
-export type TransferParams = {
+export type SwapRequestParameters = {
     sender: `0x${string}`,
     recipient: `0x${string}`,
-    token: `0x${string}`,
-    amount: bigint,
+    tokenIn: `0x${string}`,
+    tokenOut: `0x${string}`,
+    amountOut: bigint,
     srcChainId: bigint,
     dstChainId: bigint,
-    swapFee: bigint,
+    verificationFee: bigint,
     solverFee: bigint,
     nonce: bigint,
     // `executed` is true when the solver has completed the transfer, and
     // it has been verified by the dcipher network
     executed: boolean,
+    requestedAt: bigint,
 }
 
-
-
-export type TransferReceipt = {
-    requestId: `0x${string}`
-    recipient: `0x${string}`
-    token: `0x${string}`
-    srcChainId: bigint
+export type SwapRequestReceipt = {
+    requestId: `0x${string}`,
+    srcChainId: bigint,
+    dstChainId: bigint,
+    token: `0x${string}`,
     // `fulfilled` is true when the solver has completed the transfer
     // but it may or may not have been verified by the dcipher network
     fulfilled: boolean
     solver: `0x${string}`
-    amount: bigint
+    recipient: `0x${string}`
+    amountOut: bigint
     fulfilledAt: bigint
 }
 
@@ -52,8 +53,8 @@ export interface OnlySwaps {
     fetchRecommendedFee(tokenAddress: `0x${string}`, amount: bigint, srcChainId: bigint, destChainId: bigint): Promise<bigint>
 
     // used to track the status on the sourceChain
-    fetchStatus(requestId: `0x${string}`): Promise<TransferParams>
+    fetchStatus(requestId: `0x${string}`): Promise<SwapRequestParameters>
 
     // used to track the status on the destinationChain
-    fetchReceipt(requestId: `0x${string}`): Promise<TransferReceipt>
+    fetchReceipt(requestId: `0x${string}`): Promise<SwapRequestReceipt>
 }
