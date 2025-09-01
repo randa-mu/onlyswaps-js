@@ -16,8 +16,8 @@ const walletClient = createWalletClient({
     account,
 })
 
-const RUSD_ADDRESS = "0x0e194374d1acf9A7E39E84C89584dB4fdBA80D45"
-const ONLYSWAPS_ROUTER_ADDRESS = "0x417e932d69C4dBCDFeE1831afbCD897dF7b52385"
+const RUSD_ADDRESS = "0xEFdbe33D9014FFde884Bf055D5202e3851213805"
+const ONLYSWAPS_ROUTER_ADDRESS = "0x3d86B64a0f09Ca611edbcfB68309dFdEed87Ad89"
 const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
