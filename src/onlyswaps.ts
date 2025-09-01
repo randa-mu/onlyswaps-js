@@ -49,7 +49,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
             this.publicClient,
             this.walletClient,
         )
-        await rusd.approveSpend(this.contractAddress, parseEther(request.amount.toString(10)))
+        await rusd.approveSpend(this.contractAddress, parseEther((request.amount + request.fee).toString(10)))
         const swapParams = {
             functionName: "requestCrossChainSwap",
             address: this.contractAddress,
