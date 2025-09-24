@@ -1,4 +1,4 @@
-import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
+import RouterJson from "../Router.json"
 import { Abi } from "viem"
 
 export const DEFAULT_ABI: Abi = RouterJson.abi as Abi

@@ -1,6 +1,6 @@
 import { Abi, Address, PublicClient, WalletClient } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
-import ERC20FaucetToken from "../onlysubs-solidity/out/ERC20FaucetToken.sol/ERC20FaucetToken.json"
+import ERC20FaucetToken from "../ERC20FaucetToken.json"
 import { throwOnError } from "./eth"
 import Decimal from "decimal.js"
 
