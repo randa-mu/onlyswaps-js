@@ -1,4 +1,4 @@
-import RouterJson from "../Router.json"
+import RouterJson from "../abis/Router.json"
 import { Abi } from "viem"
 
 export const DEFAULT_ABI: Abi = RouterJson.abi as Abi
