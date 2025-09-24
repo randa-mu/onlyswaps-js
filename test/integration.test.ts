@@ -16,8 +16,8 @@ const walletClient = createWalletClient({
     account,
 })
 
-const RUSD_ADDRESS = "0xEFdbe33D9014FFde884Bf055D5202e3851213805"
-const ONLYSWAPS_ROUTER_ADDRESS = "0x3d86B64a0f09Ca611edbcfB68309dFdEed87Ad89"
+const RUSD_ADDRESS = "0x6b0fB8117C30B5ae16Db76aB7a1F2Bde9F7ED61b"
+const ONLYSWAPS_ROUTER_ADDRESS = "0xA504fBff16352e397E3Bc1459A284c4426c55787"
 const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
@@ -39,10 +39,11 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
 
     const { requestId } = await onlyswaps.swap({
         recipient: MY_ADDRESS,
-        tokenAddress: RUSD_ADDRESS,
+        srcTokenAddress: RUSD_ADDRESS,
+        destTokenAddress: RUSD_ADDRESS,
         amount: 100n,
         fee: 1n,
-        destinationChainId: 1338n
+        destinationChainId: 31338n
     }, rusd)
 
     expect(requestId).not.toBe(undefined)

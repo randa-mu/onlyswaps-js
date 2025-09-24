@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# deploys the contracts from onlysubs-solidity to a locally running anvil instance with
+# deploys the contracts from onlyswaps-solidity to a locally running anvil instance with
 # one of the default private keys
 
 set -euo pipefail
@@ -17,5 +17,5 @@ export BLS_PUBLIC_KEY_X1=1826899187556335724041324440800475868418708681723352768
 export BLS_PUBLIC_KEY_Y0=11401601170172090472795479479864222172123705188644469125048759621824127399516
 export BLS_PUBLIC_KEY_Y1=8044854403167346152897273335539146380878155193886184396711544300199836788154
 
-cd $SCRIPT_DIR/../onlysubs-solidity
+cd $SCRIPT_DIR/../onlyswaps-solidity
 forge script script/onlyswaps/DeployAllContracts.s.sol:DeployAllContracts --broadcast --rpc-url $RPC_URL --private-key $PRIVATE_KEY --force
