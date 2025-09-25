@@ -58,6 +58,6 @@ export interface OnlySwaps {
     fetchReceipt(requestId: `0x${string}`): Promise<SwapRequestReceipt>
 }
 
-export type OSPublicClient = Client<Transport, Chain> & PublicActions<Transport, Chain, Account>
-export type OSWalletClient = Client<Transport, Chain> & WalletActions<Chain, Account>
+export type OSPublicClient = Client<Transport, Chain> & PublicActions<Transport, Chain, Account | undefined> // account optional for public client
+export type OSWalletClient = Client<Transport, Chain> & PublicActions<Transport, Chain, Account> & WalletActions<Chain, Account>
 export type OSBothClient = OSPublicClient & OSWalletClient
