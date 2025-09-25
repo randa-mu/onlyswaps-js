@@ -1,6 +1,5 @@
 import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
-import { Abi } from "viem"
-
+import { Abi, Client, Transport, Chain, PublicActions, Account, WalletActions } from "viem"
 export const DEFAULT_ABI: Abi = RouterJson.abi as Abi
 export type SwapRequest = {
     recipient: `0x${string}`
@@ -58,3 +57,7 @@ export interface OnlySwaps {
     // used to track the status on the destinationChain
     fetchReceipt(requestId: `0x${string}`): Promise<SwapRequestReceipt>
 }
+
+export type OSPublicClient = Client<Transport, Chain> & PublicActions<Transport, Chain, Account>
+export type OSWalletClient = Client<Transport, Chain> & WalletActions<Chain, Account>
+export type OSBothClient = OSPublicClient & OSWalletClient
