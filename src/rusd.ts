@@ -17,7 +17,7 @@ export interface RUSD {
 
 export class RUSDViemClient<client extends OSPublicClient> implements RUSD {
     constructor(
-        private account: Address,
+        private _account: Address, // _account may be used by future read functions
         private contractAddr: Address,
         private client: client,
         private abi: Abi = DEFAULT_ABI
