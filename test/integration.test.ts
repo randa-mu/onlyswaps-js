@@ -1,20 +1,17 @@
 import { expect, test } from "@jest/globals"
-import { createPublicClient, createWalletClient, http } from "viem"
+import { createWalletClient, http, publicActions } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { foundry } from "viem/chains"
 import { OnlySwapsViemClient, RUSDViemClient } from "../src"
 
 const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
-const publicClient = createPublicClient({
-    chain: foundry,
-    transport: http("http://localhost:31337"),
-})
 
-const walletClient = createWalletClient({
+
+const client = createWalletClient({
     chain: foundry,
     transport: http("http://localhost:31337"),
     account,
-})
+}).extend(publicActions)
 
 const RUSD_ADDRESS = "0xEFdbe33D9014FFde884Bf055D5202e3851213805"
 const ONLYSWAPS_ROUTER_ADDRESS = "0x3d86B64a0f09Ca611edbcfB68309dFdEed87Ad89"
@@ -24,14 +21,12 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     const rusd = new RUSDViemClient(
         MY_ADDRESS,
         RUSD_ADDRESS,
-        publicClient,
-        walletClient
+        client
     )
     const onlyswaps = new OnlySwapsViemClient(
         MY_ADDRESS,
         ONLYSWAPS_ROUTER_ADDRESS,
-        publicClient,
-        walletClient,
+        client,
     )
 
     await rusd.mint()
@@ -59,8 +54,7 @@ test("can fetch suggested fee", async () => {
     const onlyswaps = new OnlySwapsViemClient(
         MY_ADDRESS,
         ONLYSWAPS_ROUTER_ADDRESS,
-        publicClient,
-        walletClient
+        client
     )
 
     const fee = await onlyswaps.fetchRecommendedFee("0x00000", 1n, 8453n, 43114n)
