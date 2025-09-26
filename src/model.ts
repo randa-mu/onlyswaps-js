@@ -1,10 +1,11 @@
-import RouterJson from "../onlysubs-solidity/out/Router.sol/Router.json"
+import RouterJson from "../onlyswaps-solidity/out/Router.sol/Router.json"
 import { Abi } from "viem"
 
 export const DEFAULT_ABI: Abi = RouterJson.abi as Abi
 export type SwapRequest = {
     recipient: `0x${string}`
-    tokenAddress: `0x${string}`
+    srcTokenAddress: `0x${string}`
+    destTokenAddress: `0x${string}`
     amount: bigint // the amount of stablecoin in ether, e.g. 100n == 100 USD
     fee: bigint // the fee amount in stablecoin expressed as ether, e.g. 1n == 1 USD
     destinationChainId: bigint
@@ -35,7 +36,8 @@ export type SwapRequestReceipt = {
     requestId: `0x${string}`,
     srcChainId: bigint,
     dstChainId: bigint,
-    token: `0x${string}`,
+    tokenIn: `0x${string}`,
+    tokenOut: `0x${string}`,
     // `fulfilled` is true when the solver has completed the transfer
     // but it may or may not have been verified by the dcipher network
     fulfilled: boolean

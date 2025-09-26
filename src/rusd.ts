@@ -1,8 +1,8 @@
 import { Abi, Address, PublicClient, WalletClient } from "viem"
-import { waitForTransactionReceipt } from "viem/actions"
-import ERC20FaucetToken from "../onlysubs-solidity/out/ERC20FaucetToken.sol/ERC20FaucetToken.json"
-import { throwOnError } from "./eth"
 import Decimal from "decimal.js"
+import { waitForTransactionReceipt } from "viem/actions"
+import ERC20FaucetToken from "../onlyswaps-solidity/out/ERC20FaucetToken.sol/ERC20FaucetToken.json"
+import { throwOnError } from "./eth"
 
 const DEFAULT_ABI: Abi = ERC20FaucetToken.abi as Abi
 
@@ -66,6 +66,7 @@ export class RUSDViemClient implements RUSD {
 }
 
 const RUSD_FRACTION_DIGITS = 18
+
 export function rusdToString(value: bigint, decimals: number = 2): string {
     if (decimals > RUSD_FRACTION_DIGITS) {
         decimals = RUSD_FRACTION_DIGITS

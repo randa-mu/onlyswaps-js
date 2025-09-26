@@ -45,7 +45,7 @@ export class OnlySwapsViemClient implements OnlySwaps {
         // first we approve the spend of RUSD for swapping
         const rusd = client ?? new RUSDViemClient(
             this.account,
-            request.tokenAddress,
+            request.srcTokenAddress,
             this.publicClient,
             this.walletClient,
         )
@@ -54,8 +54,14 @@ export class OnlySwapsViemClient implements OnlySwaps {
             functionName: "requestCrossChainSwap",
             address: this.contractAddress,
             abi: this.abi,
-            // right now, we only support the same token address on multiple chains
-            args: [request.tokenAddress, request.tokenAddress, request.amount, request.fee, request.destinationChainId, request.recipient],
+            args: [
+                request.srcTokenAddress,
+                request.destTokenAddress,
+                request.amount,
+                request.fee,
+                request.destinationChainId,
+                request.recipient
+            ],
             account: this.account,
             chain: this.walletClient.chain,
         }
@@ -105,14 +111,15 @@ export class OnlySwapsViemClient implements OnlySwaps {
             abi: this.abi,
             functionName: "getSwapRequestReceipt",
             args: [requestId],
-        }) as TransferReceiptReturnType
-        const [, srcChainId, dstChainId, token, fulfilled, solver, recipient, amountOut, fulfilledAt] = response
+        }) as SwapReceipt
+        const [, srcChainId, dstChainId, tokenIn, tokenOut, fulfilled, solver, recipient, amountOut, fulfilledAt] = response
 
         return {
             requestId,
             srcChainId,
             dstChainId,
-            token,
+            tokenIn,
+            tokenOut,
             fulfilled,
             solver,
             recipient,
@@ -123,11 +130,12 @@ export class OnlySwapsViemClient implements OnlySwaps {
 }
 
 // the contract returns a tuple rather than a struct
-type TransferReceiptReturnType = [
+type SwapReceipt = [
     requestId: `0x${string}`,
     srcChainId: bigint,
     dstChainId: bigint,
-    token: `0x${string}`,
+    tokenIn: `0x${string}`,
+    tokenOut: `0x${string}`,
     // `fulfilled` is true when the solver has completed the transfer
     // but it may or may not have been verified by the dcipher network
     fulfilled: boolean,

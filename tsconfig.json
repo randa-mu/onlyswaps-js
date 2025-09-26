@@ -22,7 +22,7 @@
   },
   "include": [
     "./src",
-    "./onlysubs-solidity/out/**/*"
+    "./onlyswaps-solidity/out/**/*"
   ],
   "compileOnSave": true
 }

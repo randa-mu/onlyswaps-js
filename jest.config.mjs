@@ -3,7 +3,7 @@ export default {
     testEnvironment: "node",
     extensionsToTreatAsEsm: [".ts"],
     moduleNameMapper: {
-        '^@/solidity/(.*)$': '<rootDir>/onlysubs-solidity/out/$1'
+        '^@/solidity/(.*)$': '<rootDir>/onlyswaps-solidity/out/$1'
     },
     transform: {
         "^.+\\.(ts|tsx)$": ["ts-jest", {

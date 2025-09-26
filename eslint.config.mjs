@@ -11,7 +11,7 @@ export default tseslint.config(
             "src/generated/**", 
             "index.js", 
             "dist/**",
-            "onlysubs-solidity/**"
+            "onlyswaps-solidity/**"
         ]
     }
 );
