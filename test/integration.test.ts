@@ -1,8 +1,12 @@
 import { expect, test } from "@jest/globals"
 import { createPublicClient, createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import { foundry } from "viem/chains"
-import { OnlySwapsViemClient, RUSDViemClient } from "../src"
+import { avalancheFuji, baseSepolia, foundry } from "viem/chains"
+import { RouterClient } from "../src"
+import { ViemChainBackend } from "../src"
+import { createBalanceOfCall, createMintCall } from "../src"
+import { FeesRequest, fetchRecommendedFees } from "../src/fees"
+import { AVAX_FUJI, BASE_SEPOLIA } from "../src"
 
 const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
 const publicClient = createPublicClient({
@@ -21,49 +25,43 @@ const ONLYSWAPS_ROUTER_ADDRESS = "0xA504fBff16352e397E3Bc1459A284c4426c55787"
 const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
-    const rusd = new RUSDViemClient(
-        MY_ADDRESS,
-        RUSD_ADDRESS,
-        publicClient,
-        walletClient
-    )
-    const onlyswaps = new OnlySwapsViemClient(
-        MY_ADDRESS,
-        ONLYSWAPS_ROUTER_ADDRESS,
-        publicClient,
-        walletClient,
+    const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
+    const onlyswaps = new RouterClient(
+        { routerAddress: ONLYSWAPS_ROUTER_ADDRESS },
+        viemBackend
     )
 
-    await rusd.mint()
-    expect(await rusd.balanceOf(account.address)).toBeGreaterThan(0n)
+    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS))
+    const balance = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
+    expect(balance).toBeGreaterThan(0n)
 
     const { requestId } = await onlyswaps.swap({
         recipient: MY_ADDRESS,
-        srcTokenAddress: RUSD_ADDRESS,
-        destTokenAddress: RUSD_ADDRESS,
+        srcToken: RUSD_ADDRESS,
+        destToken: RUSD_ADDRESS,
         amount: 100n,
         fee: 1n,
-        destinationChainId: 31338n
-    }, rusd)
+        destChainId: 31338n
+    })
 
     expect(requestId).not.toBe(undefined)
 
-    const status = await onlyswaps.fetchStatus(requestId)
+    const status = await onlyswaps.fetchRequestParams(requestId)
     expect(status.solverFee).toEqual(1n)
 
-    await onlyswaps.updateFee(requestId, 2n)
-    const statusAfter = await onlyswaps.fetchStatus(requestId)
+    await onlyswaps.updateFee(requestId, RUSD_ADDRESS, 2n)
+    const statusAfter = await onlyswaps.fetchRequestParams(requestId)
     expect(statusAfter.solverFee).toEqual(2n)
 })
 
-test("can fetch suggested fee", async () => {
-    const onlyswaps = new OnlySwapsViemClient(
-        MY_ADDRESS,
-        ONLYSWAPS_ROUTER_ADDRESS,
-        publicClient,
-        walletClient
-    )
-
-    const fee = await onlyswaps.fetchRecommendedFee("0x00000", 1n, 8453n, 43114n)
-    expect(fee).toBeGreaterThan(0n)
+test("can fetch recommended fees from the API", async () => {
+    const params: FeesRequest = {
+        sourceToken: BASE_SEPOLIA.RUSD_ADDRESS,
+        destinationToken: AVAX_FUJI.RUSD_ADDRESS,
+        sourceChainId: BigInt(baseSepolia.id),
+        destinationChainId: BigInt(avalancheFuji.id),
+        amount: 1000000n
+    }
+    const result = await fetchRecommendedFees(params)
+    expect(result.src.swapFee).toBeGreaterThan(0n)
 })

@@ -56,8 +56,8 @@
     "node": ">= 22.0.0"
   },
   "devDependencies": {
-    "@types/decimal.js": "^0.0.32",
     "@jest/globals": "^30.0.3",
+    "@types/decimal.js": "^0.0.32",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.4",
     "dotenv": "^16.6.1",
@@ -70,7 +70,9 @@
     "typescript-eslint": "^8.35.0"
   },
   "dependencies": {
+    "abitype": "^1.1.1",
     "decimal.js": "^10.6.0",
-    "viem": "^2.33.0"
+    "viem": "^2.33.0",
+    "zod": "^3.25.76"
   }
 }

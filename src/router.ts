@@ -1,0 +1,83 @@
+import { Address, Hex, TransactionReceipt, } from "viem"
+import {
+    createApproveCall,
+    createGetSwapParameters,
+    createGetSwapReceipt,
+    createSwapCall,
+    createUpdateFeesCall,
+    OnlySwapsConfig
+} from "./calls"
+import { parseSwapParams, SwapParams } from "./parser"
+import {
+    SwapRequest,
+    SwapResponse,
+    SwapRequestParameters,
+    SwapRequestReceipt,
+    ChainBackend,
+} from "./model"
+import { extractRequestId } from "./util"
+
+export class RouterClient {
+    constructor(
+        private readonly config: OnlySwapsConfig,
+        private readonly backend: ChainBackend<TransactionReceipt>,
+    ) {
+    }
+
+    async swap(request: SwapRequest | SwapParams): Promise<SwapResponse> {
+        const params = parseSwapParams(request)
+
+        const approvalCall = createApproveCall(this.config, {
+            srcToken: params.srcToken,
+            totalAmount: params.totalAmount
+        })
+        await this.backend.sendTransaction(approvalCall)
+        console.log("token spend approved")
+
+        const swapCall = createSwapCall(this.config, params)
+        const swapReceipt = await this.backend.sendTransaction(swapCall)
+        console.log("swap request complete")
+
+        const requestId = extractRequestId(swapReceipt.logs)
+        if (!requestId) {
+            throw new Error("Swap transaction confirmed, but no requestId event found")
+        }
+
+        return { requestId }
+    }
+
+    async updateFee(requestId: Hex, srcToken: Address, newFee: bigint): Promise<void> {
+        // first we must approve more funds
+        const approvalParams = { srcToken, totalAmount: newFee }
+        const approvalCall = createApproveCall(this.config, approvalParams)
+        await this.backend.sendTransaction(approvalCall)
+
+        // then we make the actual transfer
+        const params = { requestId, fee: newFee }
+        const updateFeesCall = createUpdateFeesCall(this.config, params)
+        await this.backend.sendTransaction(updateFeesCall)
+    }
+
+    async fetchRequestParams(requestId: Hex): Promise<SwapRequestParameters> {
+        return await this.backend.staticCall(createGetSwapParameters(this.config, { requestId }))
+    }
+
+    async fetchFulfilmentReceipt(requestId: Hex): Promise<SwapRequestReceipt> {
+        const response = await this.backend.staticCall(createGetSwapReceipt(this.config, { requestId }))
+        const [, srcChainId, dstChainId, tokenIn, tokenOut, fulfilled, solver, recipient, amountOut, fulfilledAt] = response
+
+        return {
+            requestId,
+            srcChainId,
+            dstChainId,
+            tokenIn,
+            tokenOut,
+            fulfilled,
+            solver,
+            recipient,
+            amountOut,
+            fulfilledAt,
+        }
+    }
+
+}
