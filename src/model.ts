@@ -24,6 +24,7 @@ export type SwapRequestParameters = {
     recipient: Hex,
     tokenIn: Hex,
     tokenOut: Hex,
+    amountIn: bigint,
     amountOut: bigint,
     srcChainId: bigint,
     dstChainId: bigint,

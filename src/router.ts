@@ -59,7 +59,12 @@ export class RouterClient {
     }
 
     async fetchRequestParams(requestId: Hex): Promise<SwapRequestParameters> {
-        return await this.backend.staticCall(createGetSwapParameters(this.config, { requestId }))
+        const requestParams = await this.backend.staticCall(createGetSwapParameters(this.config, { requestId }))
+        // the solidity code doesn't provide an `amountIn`, so we calculate it
+        return {
+            ...requestParams,
+            amountIn: requestParams.amountOut + requestParams.solverFee + requestParams.verificationFee
+        }
     }
 
     async fetchFulfilmentReceipt(requestId: Hex): Promise<SwapRequestReceipt> {
