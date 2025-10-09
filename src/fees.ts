@@ -9,7 +9,7 @@ export type FeesRequest = {
     amount: bigint
 }
 
-type FeesResponse = {
+export type FeesResponse = {
     src: ChainFee,
     dest: ChainFee,
     fees: {
@@ -18,6 +18,15 @@ type FeesResponse = {
         total: bigint,
     }
     timestamp: Date
+}
+
+export type ChainFee = {
+    currency: string
+    decimals: number
+    swapFee: bigint
+    relayFee: bigint
+    bps: number
+    bpsDivisor: number
 }
 
 type FeesDto = {
@@ -38,15 +47,6 @@ type ChainFeeDto = {
     relay_fee: string
     bps: number
     bps_divisor: number
-}
-
-type ChainFee = {
-    currency: string
-    decimals: number
-    swapFee: bigint
-    relayFee: bigint
-    bps: number
-    bpsDivisor: number
 }
 
 type FeeRequestDto = {
