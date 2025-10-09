@@ -17,9 +17,13 @@ export type FeesResponse = {
         solver: bigint,
         // the amount the network charges in wei (scales with input amount)
         network: bigint,
-        // the total amount of tokens you should approve (transfer amount + fees)
+        // the total of the solver and network fees
         total: bigint,
-    }
+    },
+    // the amount you should send to the contract to achieve the output amount you want on the destination chain
+    transferAmount: bigint,
+    // the amount you should approve on the ERC20 contract in order to cover all the fees
+    approvalAmount: bigint,
     timestamp: Date
 }
 
@@ -52,6 +56,8 @@ type FeesDto = {
         network: string,
         total: string,
     }
+    transfer_amount: string,
+    approval_amount: string,
     timestamp: number,
 }
 
@@ -101,6 +107,8 @@ function parseFees(feeResponseDto: FeesDto): FeesResponse {
             network: BigInt(feeResponseDto.fees.network),
             total: BigInt(feeResponseDto.fees.total),
         },
+        transferAmount: BigInt(feeResponseDto.transfer_amount),
+        approvalAmount: BigInt(feeResponseDto.approval_amount),
         timestamp: new Date(feeResponseDto.timestamp)
     }
 }
