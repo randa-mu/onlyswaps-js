@@ -13,19 +13,34 @@ export type FeesResponse = {
     src: ChainFee,
     dest: ChainFee,
     fees: {
+        // the amount you pay the solver in wei (a flat fee)
         solver: bigint,
+        // the amount the network charges in wei (scales with input amount)
         network: bigint,
+        // the total amount of tokens you should approve (transfer amount + fees)
         total: bigint,
     }
     timestamp: Date
 }
 
 export type ChainFee = {
+    // the name of the ERC-20 you're sending/receiving
     currency: string
+
+    // the number of decimal places the currency supports; typically 18
     decimals: number
+
+    // the average gas fee paid by solvers for fulfilling your transaction
+    // on the destination chain
     swapFee: bigint
+
+    // the average gas fee paid by the dcipher network for verifying your
+    // transaction on the source chain
     relayFee: bigint
+
+    // dcipher charges expressed as a hundredth of a percent, i.e. 500 = 5%
     bps: number
+    // the divisor used to work out the fraction of token for the fee
     bpsDivisor: number
 }
 
