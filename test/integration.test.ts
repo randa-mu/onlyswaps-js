@@ -64,4 +64,10 @@ test("can fetch recommended fees from the API", async () => {
     }
     const result = await fetchRecommendedFees(params)
     expect(result.src.swapFee).toBeGreaterThan(0n)
+
+    expect(result.approvalAmount).toBeGreaterThan(result.transferAmount)
+    expect(result.approvalAmount).toBeGreaterThan(result.fees.total)
+    expect(result.transferAmount).toBeGreaterThan(result.fees.total)
+    expect(result.fees.total).toBeGreaterThan(result.fees.network)
+    expect(result.fees.total).toBeGreaterThan(result.fees.solver)
 })
