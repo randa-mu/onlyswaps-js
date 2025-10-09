@@ -8,6 +8,7 @@ export async function postJson<T>(
 ): Promise<T> {
     const res = await fetch(url, {
         method: "POST",
+        mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     })
