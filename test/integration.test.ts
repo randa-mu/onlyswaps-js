@@ -60,7 +60,7 @@ test("can fetch recommended fees from the API", async () => {
         destinationToken: AVAX_FUJI.RUSD_ADDRESS,
         sourceChainId: BigInt(baseSepolia.id),
         destinationChainId: BigInt(avalancheFuji.id),
-        amount: 1000000n
+        amount: 1000000000000000000000n
     }
     const result = await fetchRecommendedFees(params)
     expect(result.src.swapFee).toBeGreaterThan(0n)
