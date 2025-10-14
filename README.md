@@ -30,3 +30,18 @@ This script will:
 To check the linting: `npm run lint`
 
 To fix any linter issues: `npm run lint:fix`
+
+## Known Issues
+
+**running tsc throws a `Type instantiation is excessively deep and possibly infinite.` error**
+This appears to be [an issue in viem](https://github.com/wevm/viem/issues/3726).
+The easiest workaround is to update your tsconfig to use the following:
+
+```
+// tsconfig.json
+{
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}
+```
