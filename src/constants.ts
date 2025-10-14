@@ -3,11 +3,13 @@ import { Hex } from "viem"
 export type Constants = {
     RUSD_ADDRESS: Hex,
     ROUTER_ADDRESS: Hex,
+    USDT_ADDRESS?: Hex,
 }
 
 export const BASE: Constants = {
     RUSD_ADDRESS: "0x1b0F6cF6f3185872a581BD2B5a738EB52CCd4d76",
     ROUTER_ADDRESS: "0x4cB630aAEA9e152db83A846f4509d83053F21078",
+    USDT_ADDRESS: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
 }
 
 export const BASE_SEPOLIA: Constants = {
@@ -18,6 +20,7 @@ export const BASE_SEPOLIA: Constants = {
 export const AVAX_C: Constants = {
     RUSD_ADDRESS: "0x1b0F6cF6f3185872a581BD2B5a738EB52CCd4d76",
     ROUTER_ADDRESS: "0x4cB630aAEA9e152db83A846f4509d83053F21078",
+    USDT_ADDRESS: "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7"
 }
 
 export const AVAX_FUJI: Constants = {
