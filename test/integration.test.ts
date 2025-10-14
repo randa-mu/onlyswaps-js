@@ -2,11 +2,16 @@ import { expect, test } from "@jest/globals"
 import { createPublicClient, createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { avalancheFuji, baseSepolia, foundry } from "viem/chains"
-import { RouterClient } from "../src"
-import { ViemChainBackend } from "../src"
-import { createBalanceOfCall, createMintCall } from "../src"
-import { FeesRequest, fetchRecommendedFees } from "../src/fees"
-import { AVAX_FUJI, BASE_SEPOLIA } from "../src"
+import {
+    AVAX_FUJI,
+    BASE_SEPOLIA,
+    RouterClient,
+    ViemChainBackend,
+    FeesRequest,
+    fetchRecommendedFees,
+    createBalanceOfCall,
+    createMintCall
+} from "../src"
 
 const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
 const publicClient = createPublicClient({

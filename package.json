@@ -1,6 +1,6 @@
 {
   "name": "onlyswaps-js",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0-rc2",
   "description": "A client for crosschain token swaps using only swaps",
   "keywords": [
     "dcipher",
@@ -74,7 +74,7 @@
   "dependencies": {
     "abitype": "^1.1.1",
     "decimal.js": "^10.6.0",
-    "viem": "^2.33.0",
+    "viem": "^2.38.2",
     "zod": "^3.25.76"
   }
 }
