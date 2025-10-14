@@ -1,7 +1,7 @@
 # onlyswaps-js
 ![build](https://github.com/randa-mu/onlyswaps-js/actions/workflows/build.yml/badge.svg)
 
-A Typescript client for making swaps using the OnlySwaps protocol and dcipher network.
+A Typescript client for making cross-chain token transfers using the [only swaps](https://onlyswaps.dcipher.network) protocol built on the [dcipher network](https://dcipher.network).
 
 ## Build
 `npm run build`
