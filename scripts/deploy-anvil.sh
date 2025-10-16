@@ -19,3 +19,6 @@ export BLS_PUBLIC_KEY_Y1=8044854403167346152897273335539146380878155193886184396
 
 cd $SCRIPT_DIR/../onlyswaps-solidity
 forge script script/onlyswaps/DeployAllContracts.s.sol:DeployAllContracts --broadcast --rpc-url $RPC_URL --private-key $PRIVATE_KEY --force
+
+# send 10ETH to 0x2602A1971CA485EF1026d0a06A30AAB3B847e78A (key: 0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301)
+cast send --value 10ether 0x2602A1971CA485EF1026d0a06A30AAB3B847e78A --rpc-url $RPC_URL --private-key $PRIVATE_KEY

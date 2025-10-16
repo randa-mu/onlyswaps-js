@@ -2,10 +2,13 @@
 
 import type { Abi } from "abitype"
 import {
+    Account,
+    Chain,
     ContractFunctionName,
     decodeErrorResult,
     PublicClient,
     TransactionReceipt,
+    Transport,
     WalletClient
 } from "viem"
 import { waitForTransactionReceipt } from "viem/actions"
@@ -13,18 +16,17 @@ import { waitForTransactionReceipt } from "viem/actions"
 import { EncodedCall } from "./calls"
 import { ChainBackend, ReturnTypeOf } from "./model"
 
-export class ViemChainBackend implements ChainBackend<TransactionReceipt> {
+export class ViemChainBackend<TTransport extends Transport = Transport, TChain extends Chain = Chain> implements ChainBackend<TransactionReceipt> {
     constructor(
         private readonly account: `0x${string}`,
-        private readonly publicClient: PublicClient,
-        private readonly walletClient: WalletClient,
+        private readonly publicClient: PublicClient<TTransport, TChain, undefined>,
+        private readonly walletClient: WalletClient<TTransport, Chain, Account>,
     ) {
     }
 
     async sendTransaction(call: EncodedCall<any, any>): Promise<TransactionReceipt> {
         const viemTransaction = {
             ...call,
-            account: this.account,
             chain: this.walletClient.chain,
         }
 
