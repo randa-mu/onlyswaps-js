@@ -25,13 +25,18 @@ export class ViemChainBackend<TTransport extends Transport = Transport, TChain e
     }
 
     async sendTransaction(call: EncodedCall<any, any>): Promise<TransactionReceipt> {
+        const viemTransaction = {
+            ...call,
+            chain: this.walletClient.chain,
+        }
+
         // we simulate first to catch any obvious errors before showing wallet popups
         await this.simulate(call)
 
         // then we execute the actual transaction
         let hash: `0x${string}`
         try {
-            hash = await this.walletClient.writeContract({ ...call })
+            hash = await this.walletClient.writeContract({ ...viemTransaction })
         } catch (err) {
             throw new Error(`Failed to send transaction ${call.functionName}: ${(err as Error).message}`)
         }
