@@ -13,7 +13,15 @@ import {
     createMintCall
 } from "../src"
 
-const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
+// foundry automatically signs unsigned transaction from genesis accounts, use a non-genesis wallet to make sure everything is signed properly
+// > cast wallet new
+// Successfully created new keypair.
+// Address:     0x2602A1971CA485EF1026d0a06A30AAB3B847e78A
+// Private key: 0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301
+// account funded with 10 ETH in scripts/deploy-anvil.sh
+const MY_ADDRESS = "0x2602A1971CA485EF1026d0a06A30AAB3B847e78A"
+const account = privateKeyToAccount("0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301")
+
 const publicClient = createPublicClient({
     chain: foundry,
     transport: http("http://localhost:31337"),
@@ -27,7 +35,6 @@ const walletClient = createWalletClient({
 
 const RUSD_ADDRESS = "0x6b0fB8117C30B5ae16Db76aB7a1F2Bde9F7ED61b"
 const ONLYSWAPS_ROUTER_ADDRESS = "0xA504fBff16352e397E3Bc1459A284c4426c55787"
-const MY_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
     const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
