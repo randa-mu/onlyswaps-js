@@ -67,18 +67,18 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     expect(statusAfter.solverFee).toEqual(2n)
 })
 
-test("mint tokens with simulate false actually sends tx", async () => {
+test("mint tokens with simulate false does not run simulation butsends tx", async () => {
     const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
-    // Get balance before
+    // Spy on simulate method
+    const simulateSpy = vi.spyOn(viemBackend, "simulate")
     const balanceBefore = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
-    // Actually send the mint transaction
     await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: false })
-    // Get balance after
+    expect(simulateSpy).not.toHaveBeenCalled()
     const balanceAfter = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
     expect(balanceAfter).toBeGreaterThan(balanceBefore)
 })
 
-test("mint tokens with simulate true runs simulation and does not send tx", async () => {
+test("mint tokens with simulate true runs simulation and sends tx", async () => {
     const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
     // Spy on simulate method
     const simulateSpy = vi.spyOn(viemBackend, "simulate")
@@ -86,7 +86,7 @@ test("mint tokens with simulate true runs simulation and does not send tx", asyn
     await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: true })
     const balanceAfter = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
     expect(simulateSpy).toHaveBeenCalled()
-    expect(balanceAfter).toEqual(balanceBefore)
+    expect(balanceAfter).toBeGreaterThan(balanceBefore)
 })
 
 test("can fetch recommended fees from the API", async () => {
