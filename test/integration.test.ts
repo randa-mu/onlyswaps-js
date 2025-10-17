@@ -43,7 +43,7 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
         viemBackend
     )
 
-    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS))
+    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: true })
     const balance = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
     expect(balance).toBeGreaterThan(0n)
 

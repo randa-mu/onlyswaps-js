@@ -24,16 +24,23 @@ export class ViemChainBackend<TTransport extends Transport = Transport, TChain e
     ) {
     }
 
-    async sendTransaction(call: EncodedCall<any, any>): Promise<TransactionReceipt> {
+    async sendTransaction(
+        call: EncodedCall<any, any>,
+        options?: { simulate?: boolean }
+    ): Promise<TransactionReceipt> {
+        const { simulate = false } = options ?? {};
+
         const viemTransaction = {
             ...call,
             chain: this.walletClient.chain,
         }
 
-        // we simulate first to catch any obvious errors before showing wallet popups
-        await this.simulate(call)
+        // simulate first to catch any obvious errors before showing wallet popups
+        if (simulate) {
+            await this.simulate(call);
+        }
 
-        // then we execute the actual transaction
+        // execute the actual transaction
         let hash: `0x${string}`
         try {
             hash = await this.walletClient.writeContract({ ...viemTransaction })
