@@ -1,3 +1,4 @@
+import { vi } from "vitest"
 import { expect, test } from "@jest/globals"
 import { createPublicClient, createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
@@ -75,6 +76,17 @@ test("mint tokens with simulate false actually sends tx", async () => {
     // Get balance after
     const balanceAfter = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
     expect(balanceAfter).toBeGreaterThan(balanceBefore)
+})
+
+test("mint tokens with simulate true runs simulation and does not send tx", async () => {
+    const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
+    // Spy on simulate method
+    const simulateSpy = vi.spyOn(viemBackend, "simulate")
+    const balanceBefore = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
+    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: true })
+    const balanceAfter = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
+    expect(simulateSpy).toHaveBeenCalled()
+    expect(balanceAfter).toEqual(balanceBefore)
 })
 
 test("can fetch recommended fees from the API", async () => {
