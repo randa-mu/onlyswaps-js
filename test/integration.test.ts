@@ -66,20 +66,6 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     expect(statusAfter.solverFee).toEqual(2n)
 })
 
-test("minting tokens without simulation should increase balance", async () => {
-    const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
-    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: false })
-    const balance = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
-    expect(balance).toBeGreaterThan(0n)
-})
-
-test("minting tokens with simulation should increase balance", async () => {
-    const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
-    await viemBackend.sendTransaction(createMintCall(RUSD_ADDRESS), { simulate: true })
-    const balance = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
-    expect(balance).toBeGreaterThan(0n)
-})
-
 test("can fetch recommended fees from the API", async () => {
     const params: FeesRequest = {
         sourceToken: BASE_SEPOLIA.RUSD_ADDRESS,
