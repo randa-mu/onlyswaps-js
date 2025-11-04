@@ -3,8 +3,8 @@ import { createPublicClient, createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { avalancheFuji, baseSepolia, foundry } from "viem/chains"
 import {
-    AVAX_TESTNET_FUJI,
-    BASE_TESTNET_SEPOLIA,
+    AVAX_FUJI,
+    BASE_SEPOLIA,
     RouterClient,
     ViemChainBackend,
     FeesRequest,
@@ -68,8 +68,8 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
 
 test("can fetch recommended fees from the API", async () => {
     const params: FeesRequest = {
-        sourceToken: BASE_TESTNET_SEPOLIA.RUSD_ADDRESS,
-        destinationToken: AVAX_TESTNET_FUJI.RUSD_ADDRESS,
+        sourceToken: BASE_SEPOLIA.RUSD_ADDRESS,
+        destinationToken: AVAX_FUJI.RUSD_ADDRESS,
         sourceChainId: BigInt(baseSepolia.id),
         destinationChainId: BigInt(avalancheFuji.id),
         amount: 1000000000000000000000n
