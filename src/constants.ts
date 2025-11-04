@@ -17,14 +17,14 @@ export const AVAX_MAINNET: Constants = {
     ROUTER_ADDRESS: "0x4cB630aAEA9e152db83A846f4509d83053F21078",
     USDT_ADDRESS: "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7"
 }
-
+// For backward compatibility
 export const AVAX_C: Constants = AVAX_MAINNET
 
 export const AVAX_TESTNET_FUJI: Constants = {
     RUSD_ADDRESS: "0x908e1D85604E0e9e703d52D18f3f3f604Fe7Bb1b",
     ROUTER_ADDRESS: "0xC69DD549B037215BA1Ea9866FFa59603862bf986",
 }
-
+// For backward compatibility
 export const AVAX_FUJI: Constants = AVAX_TESTNET_FUJI
 
 export const BASE_MAINNET: Constants = {
@@ -32,14 +32,14 @@ export const BASE_MAINNET: Constants = {
     ROUTER_ADDRESS: "0x4cB630aAEA9e152db83A846f4509d83053F21078",
     USDT_ADDRESS: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
 }
-
+// For backward compatibility
 export const BASE: Constants = BASE_MAINNET
 
 export const BASE_TESTNET_SEPOLIA: Constants = {
     RUSD_ADDRESS: "0x908e1D85604E0e9e703d52D18f3f3f604Fe7Bb1b",
     ROUTER_ADDRESS: "0xC69DD549B037215BA1Ea9866FFa59603862bf986",
 }
-
+// For backward compatibility
 export const BASE_SEPOLIA: Constants = BASE_TESTNET_SEPOLIA
 
 export const BSC_MAINNET: Constants = {
