@@ -1,6 +1,6 @@
 {
   "name": "onlyswaps-js",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "description": "A client for crosschain token swaps using only swaps",
   "keywords": [
     "dcipher",
