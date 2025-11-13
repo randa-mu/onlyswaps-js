@@ -29,7 +29,7 @@ export class RouterClient {
 
         const approvalCall = createApproveCall(this.config, {
             srcToken: params.srcToken,
-            totalAmount: params.totalAmount
+            totalAmount: params.totalAmountIn
         })
         await this.backend.sendTransaction(approvalCall)
         console.log("token spend approved")

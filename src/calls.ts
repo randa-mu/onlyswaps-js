@@ -60,7 +60,8 @@ export function createSwapCall(config: OnlySwapsConfig, request: SwapParams): En
         args: [
             request.srcToken,
             request.destToken,
-            request.amount,
+            request.amountIn,
+            request.amountOut,
             request.fee,
             request.destChainId,
             request.recipient,
