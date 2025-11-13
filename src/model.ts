@@ -11,6 +11,7 @@ export type SwapRequest = {
     srcToken: Hex
     destToken: Hex
     amount: bigint
+    amountOut: bigint,
     fee: bigint
     destChainId: bigint
 }
