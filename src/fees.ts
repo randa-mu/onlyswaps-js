@@ -24,6 +24,8 @@ export type FeesResponse = {
     transferAmount: bigint,
     // the amount you should approve on the ERC20 contract in order to cover all the fees
     approvalAmount: bigint,
+    // the amount you will receive on the destination chain denominated in the destination currency
+    amountOut: bigint,
     timestamp: Date
 }
 
@@ -58,6 +60,7 @@ type FeesDto = {
     }
     transfer_amount: string,
     approval_amount: string,
+    amount_out: string,
     timestamp: number,
 }
 
