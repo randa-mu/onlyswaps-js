@@ -112,6 +112,7 @@ function parseFees(feeResponseDto: FeesDto): FeesResponse {
         },
         transferAmount: BigInt(feeResponseDto.transfer_amount),
         approvalAmount: BigInt(feeResponseDto.approval_amount),
+        amountOut: BigInt(feeResponseDto.amount_out),
         timestamp: new Date(feeResponseDto.timestamp)
     }
 }
