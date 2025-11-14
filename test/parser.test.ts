@@ -11,6 +11,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "1050",
             amountIn: "1000",
             amountOut: "1000",
             fee: "50",
@@ -22,7 +23,7 @@ describe("parseSwapRequest", () => {
         expect(res).toEqual({
             recipient: VALID_ADDR,
             destChainId: 84532n,
-            totalAmountIn: 1050n,
+            amountToApprove: 1050n,
             amountIn: 1000n,
             amountOut: 1000n,
             fee: 50n,
@@ -36,6 +37,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: 1050,
             amountIn: 1000,
             amountOut: "1000",
             fee: "50",
@@ -47,7 +49,7 @@ describe("parseSwapRequest", () => {
         expect(res).toEqual({
             recipient: VALID_ADDR,
             destChainId: 84532n,
-            totalAmountIn: 1050n,
+            amountToApprove: 1050n,
             amountIn: 1000n,
             amountOut: 1000n,
             fee: 50n,
@@ -62,6 +64,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "110",
             amountIn: "100",
             amountOut: "100",
             fee: "10",
@@ -77,6 +80,7 @@ describe("parseSwapRequest", () => {
             recipient: "notanaddress",
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "1010",
             amountIn: "1000",
             amountOut: "1000",
             fee: "10",
@@ -91,6 +95,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: "0x123",
             destToken: VALID_TOKEN_B,
+            amountToApprove: "1010",
             amountIn: "1000",
             amountOut: "1000",
             fee: "10",
@@ -106,6 +111,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "1010",
             amountIn: "1000",
             fee: "10",
             destChainId: 84532n,
@@ -119,6 +125,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "1010",
             amountIn: "abc",
             amountOut: "1000",
             fee: "10",
@@ -133,6 +140,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "110",
             amountIn: "100",
             amountOut: "100",
             fee: "fee10",
@@ -147,7 +155,9 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
-            amount: "100",
+            amountToApprove: "110",
+            amountIn: "100",
+            amountOut: "100",
             fee: "10",
             destChainId: "xyz",
         }
@@ -160,6 +170,7 @@ describe("parseSwapRequest", () => {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "750",
             amountIn: "500",
             amountOut: "500",
             fee: "250",
@@ -167,13 +178,14 @@ describe("parseSwapRequest", () => {
         }
 
         const res = parseSwapParams(req)
-        expect(res.totalAmountIn).toBe(750n)
+        expect(res.amountToApprove).toBe(750n)
     })
     it("correctly handles really big numbers", () => {
         const req = {
             recipient: VALID_ADDR,
             srcToken: VALID_TOKEN_A,
             destToken: VALID_TOKEN_B,
+            amountToApprove: "75000000000000000",
             amountIn: "50000000000000000",
             amountOut: "50000000000000000",
             fee: "25000000000000000",
@@ -181,14 +193,14 @@ describe("parseSwapRequest", () => {
         }
 
         const res = parseSwapParams(req)
-        expect(res.totalAmountIn).toBe(75000000000000000n)
+        expect(res.amountToApprove).toBe(75000000000000000n)
     })
 
     it("accepts an already valid swap params", () => {
         const req: SwapParams = {
             recipient: VALID_ADDR,
             destChainId: 84532n,
-            totalAmountIn: 1050n,
+            amountToApprove: 1050n,
             amountIn: 1000n,
             amountOut: 1000n,
             fee: 50n,
@@ -201,7 +213,7 @@ describe("parseSwapRequest", () => {
         expect(res).toEqual({
             recipient: VALID_ADDR,
             destChainId: 84532n,
-            totalAmountIn: 1050n,
+            amountToApprove: 1050n,
             amountIn: 1000n,
             amountOut: 1000n,
             fee: 50n,

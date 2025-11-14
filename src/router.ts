@@ -29,7 +29,7 @@ export class RouterClient {
 
         const approvalCall = createApproveCall(this.config, {
             srcToken: params.srcToken,
-            totalAmount: params.totalAmountIn
+            approvalAmount: params.amountToApprove
         })
         await this.backend.sendTransaction(approvalCall)
         console.log("token spend approved")
@@ -48,7 +48,7 @@ export class RouterClient {
 
     async updateFee(requestId: Hex, srcToken: Address, newFee: bigint): Promise<void> {
         // first we must approve more funds
-        const approvalParams = { srcToken, totalAmount: newFee }
+        const approvalParams = { srcToken, approvalAmount: newFee }
         const approvalCall = createApproveCall(this.config, approvalParams)
         await this.backend.sendTransaction(approvalCall)
 
