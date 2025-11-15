@@ -4,8 +4,9 @@ import { Address, isAddress } from "viem"
 export type SwapParams = {
     recipient: Address
     destChainId: bigint
-    totalAmount: bigint
-    amount: bigint
+    amountToApprove: bigint
+    amountIn: bigint,
+    amountOut: bigint,
     fee: bigint
     srcToken: Address
     destToken: Address
@@ -13,14 +14,14 @@ export type SwapParams = {
 
 export function parseSwapParams(request: unknown | SwapParams): SwapParams {
     const parsed = swapRequestSchema.parse(request)
-    const totalAmount = parsed.amount + parsed.fee
 
     return {
         recipient: parsed.recipient,
         destChainId: parsed.destChainId,
-        totalAmount,
-        amount: parsed.amount,
+        amountToApprove: parsed.amountToApprove,
+        amountIn: parsed.amountIn,
         fee: parsed.fee,
+        amountOut: parsed.amountOut,
         srcToken: parsed.srcToken,
         destToken: parsed.destToken,
     }
@@ -45,7 +46,9 @@ const swapRequestSchema = z.object({
     recipient: addressSchema,
     srcToken: addressSchema,
     destToken: addressSchema,
-    amount: bigintStringSchema,
+    amountToApprove: bigintStringSchema,
+    amountIn: bigintStringSchema,
+    amountOut: bigintStringSchema,
     fee: bigintStringSchema,
     destChainId: bigintStringSchema,
 })
