@@ -14,14 +14,18 @@ export type SwapParams = {
 
 export function parseSwapParams(request: unknown | SwapParams): SwapParams {
     const parsed = swapRequestSchema.parse(request)
+    let amountToApprove = parsed.amountToApprove
+    if (!amountToApprove) {
+        amountToApprove = parsed.amountIn + parsed.fee
+    }
 
     return {
         recipient: parsed.recipient,
         destChainId: parsed.destChainId,
-        amountToApprove: parsed.amountToApprove,
         amountIn: parsed.amountIn,
-        fee: parsed.fee,
         amountOut: parsed.amountOut,
+        fee: parsed.fee,
+        amountToApprove,
         srcToken: parsed.srcToken,
         destToken: parsed.destToken,
     }

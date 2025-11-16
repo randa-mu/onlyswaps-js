@@ -51,7 +51,9 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
         recipient: MY_ADDRESS,
         srcToken: RUSD_ADDRESS,
         destToken: RUSD_ADDRESS,
-        amount: 100n,
+        amountIn: 100n,
+        amountOut: 100n,
+        amountToApprove: 101n,
         fee: 1n,
         destChainId: 31338n
     })
