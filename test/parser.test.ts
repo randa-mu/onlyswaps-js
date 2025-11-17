@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals"
-import { parseSwapParams, SwapParams } from "../src/parser"
+import { parseSwapRequest } from "../src/parser"
+import { SwapRequest } from "../src"
 
 const VALID_ADDR = "0x1111111111111111111111111111111111111111"
 const VALID_TOKEN_A = "0x2222222222222222222222222222222222222222"
@@ -18,7 +19,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
 
         expect(res).toEqual({
             recipient: VALID_ADDR,
@@ -44,7 +45,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
 
         expect(res).toEqual({
             recipient: VALID_ADDR,
@@ -71,7 +72,7 @@ describe("parseSwapRequest", () => {
             destChainId: "84532",
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
         expect(res.destChainId).toBe(84532n)
     })
 
@@ -87,7 +88,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        expect(() => parseSwapParams(req)).toThrow(/Invalid address/)
+        expect(() => parseSwapRequest(req)).toThrow(/Invalid address/)
     })
 
     it("throws if srcToken is invalid", () => {
@@ -102,7 +103,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        expect(() => parseSwapParams(req)).toThrow(/Invalid address/)
+        expect(() => parseSwapRequest(req)).toThrow(/Invalid address/)
     })
 
 
@@ -117,7 +118,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        expect(() => parseSwapParams(req)).toThrow(/Invalid input/)
+        expect(() => parseSwapRequest(req)).toThrow(/Invalid input/)
     })
 
     it("throws if amount is non-numeric", () => {
@@ -132,7 +133,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        expect(() => parseSwapParams(req)).toThrow(/Expected numeric string/)
+        expect(() => parseSwapRequest(req)).toThrow(/Expected numeric string/)
     })
 
     it("throws if fee is non-numeric", () => {
@@ -147,7 +148,7 @@ describe("parseSwapRequest", () => {
             destChainId: 84532n,
         }
 
-        expect(() => parseSwapParams(req)).toThrow(/Expected numeric string/)
+        expect(() => parseSwapRequest(req)).toThrow(/Expected numeric string/)
     })
 
     it("throws if destChainId is invalid string", () => {
@@ -162,7 +163,7 @@ describe("parseSwapRequest", () => {
             destChainId: "xyz",
         }
 
-        expect(() => parseSwapParams(req)).toThrow()
+        expect(() => parseSwapRequest(req)).toThrow()
     })
 
     it("correctly computes totalAmount = amount + fee", () => {
@@ -177,7 +178,7 @@ describe("parseSwapRequest", () => {
             destChainId: 1n,
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
         expect(res.amountToApprove).toBe(750n)
     })
     it("correctly handles really big numbers", () => {
@@ -192,12 +193,12 @@ describe("parseSwapRequest", () => {
             destChainId: 1n,
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
         expect(res.amountToApprove).toBe(75000000000000000n)
     })
 
     it("accepts an already valid swap params", () => {
-        const req: SwapParams = {
+        const req: SwapRequest = {
             recipient: VALID_ADDR,
             destChainId: 84532n,
             amountToApprove: 1050n,
@@ -208,7 +209,7 @@ describe("parseSwapRequest", () => {
             destToken: VALID_TOKEN_B,
         }
 
-        const res = parseSwapParams(req)
+        const res = parseSwapRequest(req)
 
         expect(res).toEqual({
             recipient: VALID_ADDR,

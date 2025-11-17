@@ -7,13 +7,13 @@ import {
     createUpdateFeesCall,
     OnlySwapsConfig
 } from "./calls"
-import { parseSwapParams, SwapParams } from "./parser"
+import { parseSwapRequest } from "./parser"
 import {
-    SwapRequest,
     SwapResponse,
     SwapRequestParameters,
     SwapRequestReceipt,
     ChainBackend,
+    SwapRequest,
 } from "./model"
 import { extractRequestId } from "./util"
 
@@ -24,8 +24,8 @@ export class RouterClient {
     ) {
     }
 
-    async swap(request: SwapRequest | SwapParams): Promise<SwapResponse> {
-        const params = parseSwapParams(request)
+    async swap(request: SwapRequest): Promise<SwapResponse> {
+        const params = parseSwapRequest(request)
 
         const approvalCall = createApproveCall(this.config, {
             srcToken: params.srcToken,

@@ -1,19 +1,15 @@
-import {
-    Abi,
-    ContractFunctionName,
-    Hex,
-    ReadContractReturnType,
-} from "viem"
+import { Abi, Address, ContractFunctionName, Hex, ReadContractReturnType, } from "viem"
 import { EncodedCall } from "./calls"
 
 export type SwapRequest = {
-    recipient: Hex
-    srcToken: Hex
-    destToken: Hex
-    amount: bigint
+    recipient: Address
+    destChainId: bigint
+    amountToApprove: bigint
+    amountIn: bigint,
     amountOut: bigint,
     fee: bigint
-    destChainId: bigint
+    srcToken: Address
+    destToken: Address
 }
 
 export type SwapResponse = {
