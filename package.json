@@ -1,6 +1,6 @@
 {
   "name": "onlyswaps-js",
-  "version": "1.0.0-rc6",
+  "version": "1.0.0",
   "description": "A client for crosschain token swaps using only swaps",
   "keywords": [
     "dcipher",
@@ -52,7 +52,7 @@
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint --fix",
-    "test": "jest ./test/*.test.ts"
+    "test": "jest ./test/*.test.ts --update-snapshot"
   },
   "engines": {
     "node": ">= 22.0.0"

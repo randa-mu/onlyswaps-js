@@ -31,6 +31,13 @@ To check the linting: `npm run lint`
 
 To fix any linter issues: `npm run lint:fix`
 
+## Maintenance
+
+### When updating the onlyswaps-solidity submodule
+- switch to the latest commit
+- compile and add the ABI to [the ABI file](https://github.com/randa-mu/onlyswaps-js/blob/46388be4c9f630142a501441fd20ca27144e1823/src/abi.ts#L5)
+- bump the version
+
 ## Known Issues
 
 **tsc throws a `Type instantiation is excessively deep and possibly infinite.` error**

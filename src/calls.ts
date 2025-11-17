@@ -1,6 +1,7 @@
 import { Abi, Address, ContractFunctionArgs, ContractFunctionName, erc20Abi, Hex } from "viem"
 import { FAUCET_ABI, ROUTER_ABI } from "./abi"
-import { SwapParams } from "./parser"
+
+import { SwapRequest } from "./model"
 
 export type EncodedCall<
     TAbi extends Abi,
@@ -41,18 +42,18 @@ export function createBalanceOfCall(params: BalanceOfParams): EncodedCall<typeof
 
 type ApprovalParams = {
     srcToken: Address,
-    totalAmount: bigint
+    approvalAmount: bigint
 }
 export function createApproveCall(config: OnlySwapsConfig, request: ApprovalParams): EncodedCall<typeof erc20Abi, "approve"> {
     return {
         address: request.srcToken,
         abi: erc20Abi,
         functionName: "approve",
-        args: [config.routerAddress, request.totalAmount]
+        args: [config.routerAddress, request.approvalAmount]
     }
 }
 
-export function createSwapCall(config: OnlySwapsConfig, request: SwapParams): EncodedCall<typeof ROUTER_ABI, "requestCrossChainSwap"> {
+export function createSwapCall(config: OnlySwapsConfig, request: SwapRequest): EncodedCall<typeof ROUTER_ABI, "requestCrossChainSwap"> {
     return {
         address: config.routerAddress,
         abi: ROUTER_ABI,
@@ -60,7 +61,8 @@ export function createSwapCall(config: OnlySwapsConfig, request: SwapParams): En
         args: [
             request.srcToken,
             request.destToken,
-            request.amount,
+            request.amountIn,
+            request.amountOut,
             request.fee,
             request.destChainId,
             request.recipient,

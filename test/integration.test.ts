@@ -33,8 +33,8 @@ const walletClient = createWalletClient({
     account,
 })
 
-const RUSD_ADDRESS = "0x6b0fB8117C30B5ae16Db76aB7a1F2Bde9F7ED61b"
-const ONLYSWAPS_ROUTER_ADDRESS = "0xA504fBff16352e397E3Bc1459A284c4426c55787"
+const RUSD_ADDRESS = "0x13a6618E42AFb5b700534535B113eb013B746977"
+const ONLYSWAPS_ROUTER_ADDRESS = "0xE16716C8210D8C9e8B8C756e70558d049f8EAcA1"
 
 test("mint tokens, request a swap, update the fee, check everything has been updated", async () => {
     const viemBackend = new ViemChainBackend(MY_ADDRESS, publicClient, walletClient)
@@ -51,7 +51,9 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
         recipient: MY_ADDRESS,
         srcToken: RUSD_ADDRESS,
         destToken: RUSD_ADDRESS,
-        amount: 100n,
+        amountIn: 100n,
+        amountOut: 100n,
+        amountToApprove: 101n,
         fee: 1n,
         destChainId: 31338n
     })
