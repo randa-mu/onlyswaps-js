@@ -70,7 +70,7 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
 
 test("can fetch recommended fees from the API", async () => {
     const params: FeesRequest = {
-        sourceToken: BASE_SEPOLIA.RUSD_ADDRESS,
+        sourceToken: BASE_SEPOLIA.FUSD_ADDRESS!,
         destinationToken: AVAX_FUJI.RUSD_ADDRESS,
         sourceChainId: BigInt(baseSepolia.id),
         destinationChainId: BigInt(avalancheFuji.id),
