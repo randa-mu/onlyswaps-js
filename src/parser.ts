@@ -1,26 +1,21 @@
 import * as z from "zod"
 import { Address, isAddress } from "viem"
+import { SwapRequest } from "./model"
 
-export type SwapParams = {
-    recipient: Address
-    destChainId: bigint
-    totalAmount: bigint
-    amount: bigint
-    fee: bigint
-    srcToken: Address
-    destToken: Address
-}
-
-export function parseSwapParams(request: unknown | SwapParams): SwapParams {
+export function parseSwapRequest(request: unknown | SwapRequest): SwapRequest {
     const parsed = swapRequestSchema.parse(request)
-    const totalAmount = parsed.amount + parsed.fee
+    let amountToApprove = parsed.amountToApprove
+    if (!amountToApprove) {
+        amountToApprove = parsed.amountIn + parsed.fee
+    }
 
     return {
         recipient: parsed.recipient,
         destChainId: parsed.destChainId,
-        totalAmount,
-        amount: parsed.amount,
+        amountIn: parsed.amountIn,
+        amountOut: parsed.amountOut,
         fee: parsed.fee,
+        amountToApprove,
         srcToken: parsed.srcToken,
         destToken: parsed.destToken,
     }
@@ -45,7 +40,9 @@ const swapRequestSchema = z.object({
     recipient: addressSchema,
     srcToken: addressSchema,
     destToken: addressSchema,
-    amount: bigintStringSchema,
+    amountToApprove: bigintStringSchema,
+    amountIn: bigintStringSchema,
+    amountOut: bigintStringSchema,
     fee: bigintStringSchema,
     destChainId: bigintStringSchema,
 })

@@ -1,6 +1,6 @@
 services:
   anvil:
-    image: ghcr.io/foundry-rs/foundry:v1.3.5
+    image: ghcr.io/foundry-rs/foundry:v1.4.4
     entrypoint: anvil --host 0.0.0.0 --port 31337 --chain-id 31337 --block-time 3 --load-state /mnt/31337.json
     volumes:
       - "./docker:/mnt"

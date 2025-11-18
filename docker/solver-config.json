@@ -1,0 +1,13 @@
+{
+  "networks": [{
+    "chain_id": 31337,
+    "rpc_url": "ws://anvil_1:31337",
+    "rusd_address": "0x13a6618e42afb5b700534535b113eb013b746977",
+    "router_address": "0xe16716c8210d8c9e8b8c756e70558d049f8eaca1"
+  }, {
+    "chain_id": 31338,
+    "rpc_url": "ws://anvil_2:31338",
+    "rusd_address": "0x13a6618e42afb5b700534535b113eb013b746977",
+    "router_address": "0xe16716c8210d8c9e8b8c756e70558d049f8eaca1"
+  }]
+}
