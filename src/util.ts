@@ -4,13 +4,29 @@ import type { Log, RpcLog } from "viem"
 export async function postJson<T>(
     url: string,
     body: unknown,
-    errorMessage: string,
+    errorMessage: string = "error posting: ",
 ): Promise<T> {
     const res = await fetch(url, {
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+        throw new Error(`${errorMessage} (status ${res.status} ${res.statusText})`)
+    }
+
+    return res.json()
+}
+
+export async function getJson<T>(
+    url: string,
+    errorMessage: string = "error getting: ",
+): Promise<T> {
+    const res = await fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
     })
 
     if (!res.ok) {
