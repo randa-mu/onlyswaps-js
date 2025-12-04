@@ -14,6 +14,7 @@ export type SwapRequest = {
 
 export type SwapResponse = {
     requestId: Hex
+    transactionHash: Hex
 }
 
 export type SwapRequestParameters = {

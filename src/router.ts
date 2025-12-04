@@ -43,7 +43,7 @@ export class RouterClient {
             throw new Error("Swap transaction confirmed, but no requestId event found")
         }
 
-        return { requestId }
+        return { requestId, transactionHash: swapReceipt.transactionHash }
     }
 
     async updateFee(requestId: Hex, srcToken: Address, newFee: bigint): Promise<void> {
