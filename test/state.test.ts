@@ -32,7 +32,7 @@ describe("state API", () => {
         expect(result[0].sourceChainId).toEqual(84532)
         expect(result[0].destinationChainId).toEqual(43113)
         expect(result[0].amountIn).toEqual(10000000n)
-        expect(result[0].requestedTimeMs).toEqual(1764846580000)
+        expect(result[0].requestedTimeMs).toEqual(1764846580)
     })
 
     it("empty state returns empty array", async () => {
