@@ -3,36 +3,36 @@ import { fetchTransactions } from "../src/state"
 
 describe("state API", () => {
     it("maps valid results", async () => {
-        // here's a state stolen from the
+        // here's a state stolen from the state API
         // [
-        //     {
-        //         "request_id": "0x47c48898ee916439a75c423b8ddca8b58294cdaf9fd8f218f576ecd8078bb589",
-        //         "src_chain_id": 43113,
-        //         "dest_chain_id": 84532,
-        //         "sender": "0x23bcb0d1706d2733eb0f7f0e757f76957135448a",
-        //         "recipient": "0x23bcb0d1706d2733eb0f7f0e757f76957135448a",
-        //         "token_in": "0xfddcb87afed6b20cf7616a7339bc5f8ac37154c3",
-        //         "token_out": "0x9eb392a6286138e5d59a40da5398e567ab3aad7c",
-        //         "amount_in": "997575",
-        //         "amount_out": "965150",
-        //         "verification_fee": "2425",
-        //         "solver_fee": "30000",
-        //         "state": "verified",
-        //         "solver": "0xebf1b841eff6d50d87d4022372bc1191e781ab68",
-        //         "requested_time": 1764597498,
-        //         "solved_time": 1764597506,
-        //         "verified_time": 1764597509
-        //     }
+        // {
+        //   "request_id": "0x5d59dbac3aae43d4cebd09c6ef55a7cbcf00f4bf6169a44539df8b2db2c0b412",
+        //   "src_chain_id": 84532,
+        //   "dest_chain_id": 43113,
+        //   "sender": "0x17b3cab3cd7502c6b85ed2e11fd5988af76cdd32",
+        //   "recipient": "0x17b3cab3cd7502c6b85ed2e11fd5988af76cdd32",
+        //   "token_in": "0x9eb392a6286138e5d59a40da5398e567ab3aad7c",
+        //   "token_out": "0xfddcb87afed6b20cf7616a7339bc5f8ac37154c3",
+        //   "amount_in": "10000000",
+        //   "amount_out": "9945075",
+        //   "verification_fee": "24925",
+        //   "solver_fee": "30000",
+        //   "state": "verified",
+        //   "solver": "0xebf1b841eff6d50d87d4022372bc1191e781ab68",
+        //   "requested_time": 1764846580,
+        //   "solved_time": 1764846587,
+        //   "verified_time": 1764846592
+        // }
         // ]
         //
 
-        const query = { requestId: "0x47c48898ee916439a75c423b8ddca8b58294cdaf9fd8f218f576ecd8078bb589" } as const
+        const query = { requestId: "0x5d59dbac3aae43d4cebd09c6ef55a7cbcf00f4bf6169a44539df8b2db2c0b412" } as const
         const result = await fetchTransactions(query)
         expect(result.length).toEqual(1)
-        expect(result[0].sourceChainId).toEqual(43113)
-        expect(result[0].destinationChainId).toEqual(84532)
-        expect(result[0].amountIn).toEqual(997575n)
-        expect(result[0].requestedTimeMs).toEqual(1764597498000)
+        expect(result[0].sourceChainId).toEqual(84532)
+        expect(result[0].destinationChainId).toEqual(43113)
+        expect(result[0].amountIn).toEqual(10000000n)
+        expect(result[0].requestedTimeMs).toEqual(1764846580000)
     })
 
     it("empty state returns empty array", async () => {

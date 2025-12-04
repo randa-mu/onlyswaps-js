@@ -47,7 +47,7 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     const balance = await viemBackend.staticCall(createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS }))
     expect(balance).toBeGreaterThan(0n)
 
-    const { requestId } = await onlyswaps.swap({
+    const { requestId, transactionHash } = await onlyswaps.swap({
         recipient: MY_ADDRESS,
         srcToken: RUSD_ADDRESS,
         destToken: RUSD_ADDRESS,
@@ -59,6 +59,7 @@ test("mint tokens, request a swap, update the fee, check everything has been upd
     })
 
     expect(requestId).not.toBe(undefined)
+    expect(transactionHash).not.toBe(undefined)
 
     const status = await onlyswaps.fetchRequestParams(requestId)
     expect(status.solverFee).toEqual(1n)
