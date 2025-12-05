@@ -32,6 +32,9 @@ export type TransactionState = {
     requestedTimeMs: number
     solvedTimeMs?: number
     verifiedTimeMs?: number
+    requestedTx?: `0x${string}`
+    solvedTx?: `0x${string}`
+    verifiedTx?: `0x${string}`
 }
 
 type TransactionStateDto = {
@@ -51,6 +54,9 @@ type TransactionStateDto = {
     requested_time: number
     solved_time?: number
     verified_time?: number
+    requested_tx?: `0x${string}`
+    solved_tx?: `0x${string}`
+    verified_tx?: `0x${string}`
 }
 
 const DEFAULT_API_URL = "https://onlyswaps-state-api-mainnet.onlyswaps.dcipher.network/transactions"
@@ -127,5 +133,8 @@ function parseTransactionState(dto: TransactionStateDto): TransactionState {
         requestedTimeMs: dto.requested_time * 1000,
         solvedTimeMs: dto.solved_time ? dto.solved_time * 1000 : undefined,
         verifiedTimeMs: dto.verified_time ? dto.verified_time * 1000 : undefined,
+        requestedTx: dto.requested_tx,
+        solvedTx: dto.solved_tx,
+        verifiedTx: dto.verified_tx,
     }
 }
