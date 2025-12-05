@@ -35,7 +35,7 @@ describe("state API", () => {
         expect(result[0].destinationChainId).toEqual(43113)
         expect(result[0].amountIn).toEqual(9970000n)
         expect(result[0].requestedTimeMs).toEqual(1764846580000)
-        // test that the tx hashes are valid EVM address formats
+        // test that the tx hashes are valid EVM formats
         const txHashRegex = /^0x([A-Fa-f0-9]{64})$/;
         expect(result[0].requestedTx).toMatch(txHashRegex)
         expect(result[0].solvedTx).toMatch(txHashRegex)
