@@ -16,6 +16,7 @@ import {
     SwapRequest,
 } from "./model"
 import { extractRequestId } from "./util"
+import { fetchTransactions, TransactionState, TransactionStateQuery } from "./state"
 
 export class RouterClient {
     constructor(
@@ -83,6 +84,10 @@ export class RouterClient {
             amountOut,
             fulfilledAt,
         }
+    }
+
+    async fetchTransactions(query: Partial<TransactionStateQuery>, apiUrl?: string): Promise<Array<TransactionState>> {
+        return fetchTransactions(query, apiUrl)
     }
 
 }
