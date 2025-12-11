@@ -4,6 +4,8 @@ import {
     createGetSwapParameters,
     createGetSwapReceipt,
     createSwapCall,
+    createSwapCallWithHooks,
+    createGetHookExecutorCall,
     createUpdateFeesCall,
     OnlySwapsConfig
 } from "./calls"
@@ -28,14 +30,40 @@ export class RouterClient {
     async swap(request: SwapRequest): Promise<SwapResponse> {
         const params = parseSwapRequest(request)
 
+        // Check if there are any hooks
+        const hasPreHooks = params.preHooks && params.preHooks.length > 0
+        const hasPostHooks = params.postHooks && params.postHooks.length > 0
+        const hasHooks = hasPreHooks || hasPostHooks
+        
+        // If there are any hooks, validate hook executor is not zero address
+        let finalRequest = params
+        if (hasHooks) {
+            const hookExecutor = await this.getHookExecutor()
+            if (hookExecutor === "0x0000000000000000000000000000000000000000") {
+                throw new Error("Hook executor address is zero address, but hooks are provided")
+            }
+            
+            // Only change recipient if there are postHooks
+            // PostHooks need the hook executor to receive tokens and execute hooks
+            if (hasPostHooks) {
+                finalRequest = {
+                    ...params,
+                    recipient: hookExecutor
+                }
+            }
+        }
+
         const approvalCall = createApproveCall(this.config, {
-            srcToken: params.srcToken,
-            approvalAmount: params.amountToApprove
+            srcToken: finalRequest.srcToken,
+            approvalAmount: finalRequest.amountToApprove
         })
         await this.backend.sendTransaction(approvalCall)
         console.log("token spend approved")
 
-        const swapCall = createSwapCall(this.config, params)
+        // Use hooks version if hooks are provided
+        const swapCall = hasHooks 
+            ? createSwapCallWithHooks(this.config, finalRequest)
+            : createSwapCall(this.config, finalRequest)
         const swapReceipt = await this.backend.sendTransaction(swapCall)
         console.log("swap request complete")
 
@@ -45,6 +73,11 @@ export class RouterClient {
         }
 
         return { requestId, transactionHash: swapReceipt.transactionHash }
+    }
+
+    async getHookExecutor(): Promise<Address> {
+        const hookExecutor = await this.backend.staticCall(createGetHookExecutorCall(this.config))
+        return hookExecutor as Address
     }
 
     async updateFee(requestId: Hex, srcToken: Address, newFee: bigint): Promise<void> {

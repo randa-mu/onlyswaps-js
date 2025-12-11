@@ -1,7 +1,7 @@
-import { Abi, Address, ContractFunctionArgs, ContractFunctionName, erc20Abi, Hex } from "viem"
-import { FAUCET_ABI, ROUTER_ABI } from "./abi"
+import { Abi, Address, ContractFunctionArgs, ContractFunctionName, encodeFunctionData, erc20Abi, Hex } from "viem"
+import { FAUCET_ABI, AAVE_V3_ABI, ROUTER_ABI } from "./abi"
 
-import { SwapRequest } from "./model"
+import { SwapRequest, type Hook } from "./model"
 
 export type EncodedCall<
     TAbi extends Abi,
@@ -40,6 +40,21 @@ export function createBalanceOfCall(params: BalanceOfParams): EncodedCall<typeof
     }
 }
 
+type AllowanceParams = {
+    token: Address,
+    wallet: Address,
+    spender: Address,
+}
+
+export function createAllowanceCall(params: AllowanceParams): EncodedCall<typeof erc20Abi, "allowance"> {
+    return {
+        address: params.token,
+        abi: erc20Abi,
+        functionName: "allowance",
+        args: [params.wallet, params.spender]
+    }
+}
+
 type ApprovalParams = {
     srcToken: Address,
     approvalAmount: bigint
@@ -68,6 +83,37 @@ export function createSwapCall(config: OnlySwapsConfig, request: SwapRequest): E
             request.recipient,
         ]
     }
+}
+
+export function createSwapCallWithHooks(config: OnlySwapsConfig, request: SwapRequest): EncodedCall<typeof ROUTER_ABI, "requestCrossChainSwapWithHooks"> {
+    const preHooks: Hook[] = request.preHooks || []
+    const postHooks: Hook[] = request.postHooks || []
+    
+    return {
+        address: config.routerAddress,
+        abi: ROUTER_ABI,
+        functionName: "requestCrossChainSwapWithHooks",
+        args: [
+            request.srcToken,
+            request.destToken,
+            request.amountIn,
+            request.amountOut,
+            request.fee,
+            request.destChainId,
+            request.recipient,
+            preHooks,
+            postHooks,
+        ]
+    }
+}
+
+export function createGetHookExecutorCall(config: OnlySwapsConfig): EncodedCall<typeof ROUTER_ABI, "hookExecutor"> {
+    return {
+        address: config.routerAddress,
+        abi: ROUTER_ABI,
+        functionName: "hookExecutor" as any,
+        args: []
+    } as EncodedCall<typeof ROUTER_ABI, "hookExecutor">
 }
 
 type UpdateFeesParams = {
@@ -107,5 +153,116 @@ export function createGetSwapReceipt(config: OnlySwapsConfig, params: GetSwapRec
         abi: ROUTER_ABI,
         functionName: "getSwapRequestReceipt",
         args: [params.requestId]
+    }
+}
+
+export type AaveV3SupplyParams = {
+    asset: Address,
+    amount: bigint,
+    onBehalfOf: Address,
+    referralCode?: number
+}
+
+/**
+ * Creates encoded call data for Aave V3 supply function hook.
+ * This can be used directly in preHooks or postHooks when creating swap requests.
+ * 
+ * @param params - Parameters for the Aave V3 supply function
+ * @returns Encoded function call data as Hex string
+ */
+export function createAaveV3SupplyHookCallData(params: AaveV3SupplyParams): Hex {
+    return encodeFunctionData({
+        abi: AAVE_V3_ABI,
+        functionName: "supply",
+        args: [
+            params.asset,
+            params.amount,
+            params.onBehalfOf,
+            params.referralCode ?? 0
+        ]
+    })
+}
+
+/**
+ * Returns an array with two post hooks for Aave V3 supply:
+ * 1. ERC20 approve for the AaveV3 Pool contract (uses createERC20ApproveHookCallData).
+ * 2. Aave V3 Pool supply call (uses createAaveV3SupplyHookCallData).
+ *
+ * @param params - Parameters for the supply and approval hook.
+ * @param aaveV3PoolAddress - Target address for Aave V3 Pool contract.
+ * @param gasLimit - Gas limit for each hook.
+ * @returns Array with two hook objects.
+ */
+export function createAaveV3SupplyHooks(
+    params: AaveV3SupplyParams,
+    aaveV3PoolAddress: Address,
+    gasLimit: bigint = 100_000n
+): Hook[] {
+    return [
+        {
+            target: params.asset,
+            callData: createERC20ApproveHookCallData(aaveV3PoolAddress, params.amount),
+            gasLimit,
+        },
+        {
+            target: aaveV3PoolAddress,
+            callData: createAaveV3SupplyHookCallData(params),
+            gasLimit,
+        }
+    ]
+}
+
+/**
+ * Creates encoded call data for ERC20 approve function hook.
+ * This can be used directly in preHooks or postHooks when creating swap requests.
+ * 
+ * @param spender - Address to approve for spending tokens
+ * @param amount - Amount of tokens to approve
+ * @returns Encoded function call data as Hex string
+ */
+export function createERC20ApproveHookCallData(spender: Address, amount: bigint): Hex {
+    return encodeFunctionData({
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [spender, amount]
+    })
+}
+
+/**
+ * Creates a complete ERC20 approve hook for use in preHooks or postHooks.
+ * 
+ * @param tokenAddress - Address of the ERC20 token to approve
+ * @param spender - Address to approve for spending tokens
+ * @param amount - Amount of tokens to approve
+ * @param gasLimit - Gas limit for the hook execution
+ * @returns A Hook object ready to use in swap requests
+ * 
+ * @example
+ * ```ts
+ * import { createERC20ApproveHook } from 'onlyswaps-js'
+ * 
+ * const approveHook = createERC20ApproveHook(
+ *   USDT_ADDRESS,        // token address
+ *   SPENDER_ADDRESS,     // address to approve
+ *   1000n,               // amount to approve
+ *   100_000n             // gas limit
+ * )
+ * 
+ * await onlyswaps.swap({
+ *   // ... other params
+ *   preHooks: [approveHook]
+ * })
+ * ```
+ */
+export function createERC20ApproveHook(
+    tokenAddress: Address,
+    spender: Address,
+    amount: bigint,
+    gasLimit: bigint = 100_000n
+): Hook {
+    return {
+        target: tokenAddress,
+        callData: createERC20ApproveHookCallData(spender, amount),
+        gasLimit,
     }
 }
