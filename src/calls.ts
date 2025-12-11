@@ -268,24 +268,25 @@ export function createAaveV3SupplyHookCallData(params: AaveV3SupplyParams): Hex 
  *
  * @param params - Parameters for the supply and approval hook.
  * @param aaveV3PoolAddress - Target address for Aave V3 Pool contract.
- * @param gasLimit - Gas limit for each hook.
+ * @param gasLimit - Optional gas limit for each hook. Defaults to 100000.
  * @returns Array with two hook objects.
  */
 export function createAaveV3SupplyHooks(
     params: AaveV3SupplyParams,
     aaveV3PoolAddress: Address,
-    gasLimit: bigint = 100_000n
+    gasLimit?: bigint
 ): Hook[] {
+    const hookGasLimit = gasLimit ?? 100_000n
     return [
         {
             target: params.asset,
             callData: createERC20ApproveHookCallData(aaveV3PoolAddress, params.amount),
-            gasLimit,
+            gasLimit: hookGasLimit,
         },
         {
             target: aaveV3PoolAddress,
             callData: createAaveV3SupplyHookCallData(params),
-            gasLimit,
+            gasLimit: hookGasLimit,
         }
     ]
 }
@@ -312,18 +313,26 @@ export function createERC20ApproveHookCallData(spender: Address, amount: bigint)
  * @param tokenAddress - Address of the ERC20 token to approve
  * @param spender - Address to approve for spending tokens
  * @param amount - Amount of tokens to approve
- * @param gasLimit - Gas limit for the hook execution
+ * @param gasLimit - Optional gas limit for the hook execution. Defaults to 100000.
  * @returns A Hook object ready to use in swap requests
  * 
  * @example
  * ```ts
  * import { createERC20ApproveHook } from 'onlyswaps-js'
  * 
+ * // With default gas limit
  * const approveHook = createERC20ApproveHook(
  *   USDT_ADDRESS,        // token address
  *   SPENDER_ADDRESS,     // address to approve
- *   1000n,               // amount to approve
- *   100_000n             // gas limit
+ *   1000n                // amount to approve
+ * )
+ * 
+ * // With custom gas limit
+ * const approveHookWithCustomGas = createERC20ApproveHook(
+ *   USDT_ADDRESS,
+ *   SPENDER_ADDRESS,
+ *   1000n,
+ *   150_000n             // custom gas limit
  * )
  * 
  * await onlyswaps.swap({
@@ -336,11 +345,12 @@ export function createERC20ApproveHook(
     tokenAddress: Address,
     spender: Address,
     amount: bigint,
-    gasLimit: bigint = 100_000n
+    gasLimit?: bigint
 ): Hook {
+    const hookGasLimit = gasLimit ?? 100_000n
     return {
         target: tokenAddress,
         callData: createERC20ApproveHookCallData(spender, amount),
-        gasLimit,
+        gasLimit: hookGasLimit,
     }
 }
