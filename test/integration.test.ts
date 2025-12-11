@@ -170,7 +170,7 @@ test("swap with only preHooks - recipient should not change and preHook should b
     expect(rusdAllowanceAfter).toBe(PREHOOK_APPROVAL_AMOUNT)
 })
 
-test("swap with only postHooks - recipient should change to hook executor and postHook should not be executed before relay tokens", async () => {
+test("swap with only postHooks - recipient must be hook executor on destination chain and postHook should not be executed before relay tokens", async () => {
     const { viemBackend, onlyswaps } = createTestClients()
 
     await ensureTokensMinted(viemBackend, RUSD_ADDRESS, MY_ADDRESS)
@@ -181,12 +181,14 @@ test("swap with only postHooks - recipient should change to hook executor and po
     )
     expect(mockAaveBalanceBefore).toBe(0n)
 
-    // Get hook executor address
+    // Get hook executor address (on destination chain - for cross-chain swaps this should be the hook executor on dest chain)
     const hookExecutor = await onlyswaps.getHookExecutor()
     expect(hookExecutor).not.toBe(ZERO_ADDRESS)
 
     const { requestId, transactionHash } = await onlyswaps.swap({
-        recipient: MY_ADDRESS,
+        // For postHooks, recipient must be the hook executor on the destination chain
+        // Users must manually set this to the hook executor address on the destination chain
+        recipient: hookExecutor,
         srcToken: RUSD_ADDRESS,
         destToken: RUSD_ADDRESS,
         amountIn: DEFAULT_AMOUNT_IN,
@@ -209,8 +211,7 @@ test("swap with only postHooks - recipient should change to hook executor and po
     const requestParams = await onlyswaps.fetchRequestParams(requestId)
     expect(requestParams).toBeDefined()
     
-    // The recipient should have been changed to hook executor internally.
-    // We can check this by looking at the fetched requestParams.recipient.
+    // The recipient should be the hook executor (manually set above)
     expect(requestParams.recipient.toLowerCase()).toBe(hookExecutor.toLowerCase())
 
     // Verify the post hook was not executed yet by checking the balance of the mock Aave V3 contract
@@ -220,17 +221,19 @@ test("swap with only postHooks - recipient should change to hook executor and po
     expect(mockAaveBalanceAfter).toBe(mockAaveBalanceBefore)
 })
 
-test("swap with both preHooks and postHooks - recipient should change to hook executor", async () => {
+test("swap with both preHooks and postHooks - recipient should be hook executor on destination chain", async () => {
     const { viemBackend, onlyswaps } = createTestClients()
 
     await ensureTokensMinted(viemBackend, RUSD_ADDRESS, MY_ADDRESS)
 
-    // Get hook executor address
+    // Get hook executor address (on destination chain - for cross-chain swaps this should be the hook executor on dest chain)
     const hookExecutor = await onlyswaps.getHookExecutor()
     expect(hookExecutor).not.toBe(ZERO_ADDRESS)
 
     const { requestId, transactionHash } = await onlyswaps.swap({
-        recipient: MY_ADDRESS,
+        // For postHooks, recipient must be the hook executor on the destination chain
+        // Users must manually set this to the hook executor address on the destination chain
+        recipient: hookExecutor,
         srcToken: RUSD_ADDRESS,
         destToken: RUSD_ADDRESS,
         amountIn: DEFAULT_AMOUNT_IN,
@@ -255,5 +258,8 @@ test("swap with both preHooks and postHooks - recipient should change to hook ex
     // Verify the request was created with hooks
     const requestParams = await onlyswaps.fetchRequestParams(requestId)
     expect(requestParams).toBeDefined()
+    
+    // The recipient should be the hook executor (manually set above)
+    expect(requestParams.recipient.toLowerCase()).toBe(hookExecutor.toLowerCase())
 })
 

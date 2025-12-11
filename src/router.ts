@@ -34,36 +34,18 @@ export class RouterClient {
         const hasPreHooks = params.preHooks && params.preHooks.length > 0
         const hasPostHooks = params.postHooks && params.postHooks.length > 0
         const hasHooks = hasPreHooks || hasPostHooks
-        
-        // If there are any hooks, validate hook executor is not zero address
-        let finalRequest = params
-        if (hasHooks) {
-            const hookExecutor = await this.getHookExecutor()
-            if (hookExecutor === "0x0000000000000000000000000000000000000000") {
-                throw new Error("Hook executor address is zero address, but hooks are provided")
-            }
-            
-            // Only change recipient if there are postHooks
-            // PostHooks need the hook executor to receive tokens and execute hooks
-            if (hasPostHooks) {
-                finalRequest = {
-                    ...params,
-                    recipient: hookExecutor
-                }
-            }
-        }
 
         const approvalCall = createApproveCall(this.config, {
-            srcToken: finalRequest.srcToken,
-            approvalAmount: finalRequest.amountToApprove
+            srcToken: params.srcToken,
+            approvalAmount: params.amountToApprove
         })
         await this.backend.sendTransaction(approvalCall)
         console.log("token spend approved")
 
         // Use hooks version if hooks are provided
         const swapCall = hasHooks 
-            ? createSwapCallWithHooks(this.config, finalRequest)
-            : createSwapCall(this.config, finalRequest)
+            ? createSwapCallWithHooks(this.config, params)
+            : createSwapCall(this.config, params)
         const swapReceipt = await this.backend.sendTransaction(swapCall)
         console.log("swap request complete")
 
