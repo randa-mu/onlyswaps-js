@@ -7,6 +7,8 @@ import {
     createSwapCallWithHooks,
     createGetHookExecutorCall,
     createUpdateFeesCall,
+    createRelayTokensCall,
+    createGetSwapRequestIdCall,
     OnlySwapsConfig
 } from "./calls"
 import { parseSwapRequest } from "./parser"
@@ -16,6 +18,7 @@ import {
     SwapRequestReceipt,
     ChainBackend,
     SwapRequest,
+    Hook,
 } from "./model"
 import { extractRequestId } from "./util"
 import { fetchTransactions, TransactionState, TransactionStateQuery } from "./state"
@@ -103,6 +106,57 @@ export class RouterClient {
 
     async fetchTransactions(query: Partial<TransactionStateQuery>, apiUrl?: string): Promise<Array<TransactionState>> {
         return fetchTransactions(query, apiUrl)
+    }
+
+    async getSwapRequestId(params: {
+        sender: Address,
+        recipient: Address,
+        tokenIn: Address,
+        tokenOut: Address,
+        amountIn: bigint,
+        amountOut: bigint,
+        srcChainId: bigint,
+        dstChainId: bigint,
+        verificationFee: bigint,
+        solverFee: bigint,
+        nonce: bigint,
+        executed: boolean,
+        requestedAt: bigint,
+        preHooks: Hook[],
+        postHooks: Hook[]
+    }): Promise<Hex> {
+        const call = createGetSwapRequestIdCall(this.config, params)
+        const result = await this.backend.staticCall(call)
+        return result as Hex
+    }
+
+    async relayTokens(params: {
+        solverRefundAddress: Address,
+        requestId: Hex,
+        sender: Address,
+        recipient: Address,
+        tokenIn: Address,
+        tokenOut: Address,
+        amountOut: bigint,
+        srcChainId: bigint,
+        nonce: bigint,
+        preHooks?: Hook[],
+        postHooks?: Hook[]
+    }): Promise<TransactionReceipt> {
+        const relayCall = createRelayTokensCall(this.config, {
+            solverRefundAddress: params.solverRefundAddress,
+            requestId: params.requestId,
+            sender: params.sender,
+            recipient: params.recipient,
+            tokenIn: params.tokenIn,
+            tokenOut: params.tokenOut,
+            amountOut: params.amountOut,
+            srcChainId: params.srcChainId,
+            nonce: params.nonce,
+            preHooks: params.preHooks || [],
+            postHooks: params.postHooks || [],
+        })
+        return await this.backend.sendTransaction(relayCall)
     }
 
 }

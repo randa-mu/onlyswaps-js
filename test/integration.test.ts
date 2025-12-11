@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals"
-import { createPublicClient, createWalletClient, http, Address } from "viem"
+import { createPublicClient, createWalletClient, http, Address, Hex, keccak256, encodeAbiParameters, parseEventLogs, parseAbi } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { avalancheFuji, baseSepolia, foundry } from "viem/chains"
 import {
@@ -13,8 +13,10 @@ import {
     createAllowanceCall,
     createMintCall,
     createAaveV3SupplyHooks,
-    createERC20ApproveHook
+    createERC20ApproveHook,
+    createApproveCall
 } from "../src"
+import type { Hook } from "../src/model"
 
 // foundry automatically signs unsigned transaction from genesis accounts, use a non-genesis wallet to make sure everything is signed properly
 // > cast wallet new
@@ -22,8 +24,14 @@ import {
 // Address:     0x2602A1971CA485EF1026d0a06A30AAB3B847e78A
 // Private key: 0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301
 // account funded with 10 ETH in scripts/deploy-anvil.sh
-const MY_ADDRESS = "0x2602A1971CA485EF1026d0a06A30AAB3B847e78A"
+const MY_ADDRESS = "0x2602A1971CA485EF1026d0a06A30AAB3B847e78A" as Address
 const account = privateKeyToAccount("0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301")
+
+// Solver account (using default Anvil account #0 for relayTokens testing)
+// Address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+// Private key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+const SOLVER_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" as Address
+const solverAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
 
 // Test configuration constants
 const RPC_URL = "http://localhost:31337"
@@ -37,9 +45,9 @@ const DEST_CHAIN_ID = 31338n
 const DEFAULT_GAS_LIMIT = 100_000n
 const TEST_AMOUNT_1_ETH = 1000n * 10n ** 18n // 1000 ETH in wei
 
-const RUSD_ADDRESS = "0x13a6618E42AFb5b700534535B113eb013B746977"
-const ONLYSWAPS_ROUTER_ADDRESS = "0xE16716C8210D8C9e8B8C756e70558d049f8EAcA1"
-const MOCK_AAVE_V3_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+const RUSD_ADDRESS = "0x13a6618E42AFb5b700534535B113eb013B746977" as Address
+const ONLYSWAPS_ROUTER_ADDRESS = "0xE16716C8210D8C9e8B8C756e70558d049f8EAcA1" as Address
+const MOCK_AAVE_V3_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3" as Address
 const PREHOOK_APPROVAL_AMOUNT = 1n
 
 const publicClient = createPublicClient({
@@ -51,6 +59,12 @@ const walletClient = createWalletClient({
     chain: foundry,
     transport: http(RPC_URL),
     account,
+})
+
+const solverWalletClient = createWalletClient({
+    chain: foundry,
+    transport: http(RPC_URL),
+    account: solverAccount,
 })
 
 // Helper functions
@@ -262,4 +276,3 @@ test("swap with both preHooks and postHooks - recipient should be hook executor 
     // The recipient should be the hook executor (manually set above)
     expect(requestParams.recipient.toLowerCase()).toBe(hookExecutor.toLowerCase())
 })
-

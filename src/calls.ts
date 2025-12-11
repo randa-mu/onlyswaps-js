@@ -116,6 +116,84 @@ export function createGetHookExecutorCall(config: OnlySwapsConfig): EncodedCall<
     } as EncodedCall<typeof ROUTER_ABI, "hookExecutor">
 }
 
+type GetSwapRequestIdParams = {
+    sender: Address,
+    recipient: Address,
+    tokenIn: Address,
+    tokenOut: Address,
+    amountIn: bigint,
+    amountOut: bigint,
+    srcChainId: bigint,
+    dstChainId: bigint,
+    verificationFee: bigint,
+    solverFee: bigint,
+    nonce: bigint,
+    executed: boolean,
+    requestedAt: bigint,
+    preHooks: Hook[],
+    postHooks: Hook[]
+}
+
+export function createGetSwapRequestIdCall(config: OnlySwapsConfig, params: GetSwapRequestIdParams): EncodedCall<typeof ROUTER_ABI, "getSwapRequestId"> {
+    return {
+        address: config.routerAddress,
+        abi: ROUTER_ABI,
+        functionName: "getSwapRequestId",
+        args: [{
+            sender: params.sender,
+            recipient: params.recipient,
+            tokenIn: params.tokenIn,
+            tokenOut: params.tokenOut,
+            amountIn: params.amountIn,
+            amountOut: params.amountOut,
+            srcChainId: params.srcChainId,
+            dstChainId: params.dstChainId,
+            verificationFee: params.verificationFee,
+            solverFee: params.solverFee,
+            nonce: params.nonce,
+            executed: params.executed,
+            requestedAt: params.requestedAt,
+            preHooks: params.preHooks,
+            postHooks: params.postHooks,
+        }]
+    }
+}
+
+type RelayTokensParams = {
+    solverRefundAddress: Address,
+    requestId: Hex,
+    sender: Address,
+    recipient: Address,
+    tokenIn: Address,
+    tokenOut: Address,
+    amountOut: bigint,
+    srcChainId: bigint,
+    nonce: bigint,
+    preHooks: Hook[],
+    postHooks: Hook[]
+}
+
+export function createRelayTokensCall(config: OnlySwapsConfig, params: RelayTokensParams): EncodedCall<typeof ROUTER_ABI, "relayTokens"> {
+    return {
+        address: config.routerAddress,
+        abi: ROUTER_ABI,
+        functionName: "relayTokens",
+        args: [
+            params.solverRefundAddress,
+            params.requestId,
+            params.sender,
+            params.recipient,
+            params.tokenIn,
+            params.tokenOut,
+            params.amountOut,
+            params.srcChainId,
+            params.nonce,
+            params.preHooks,
+            params.postHooks,
+        ]
+    }
+}
+
 type UpdateFeesParams = {
     requestId: Hex,
     fee: bigint
