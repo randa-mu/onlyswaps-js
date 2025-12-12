@@ -1,4 +1,4 @@
-import { Abi, Address, ContractFunctionArgs, ContractFunctionName, encodeFunctionData, erc20Abi, Hex } from "viem"
+import { Abi, Address, ContractFunctionArgs, ContractFunctionName, encodeFunctionData, erc20Abi, Hex, PublicClient } from "viem"
 import { FAUCET_ABI, AAVE_V3_ABI, ROUTER_ABI } from "./abi"
 
 import { SwapRequest, type Hook } from "./model"
@@ -234,6 +234,15 @@ export function createGetSwapReceipt(config: OnlySwapsConfig, params: GetSwapRec
     }
 }
 
+export function createGetFulfilledTransfersCall(config: OnlySwapsConfig): EncodedCall<typeof ROUTER_ABI, "getFulfilledTransfers"> {
+    return {
+        address: config.routerAddress,
+        abi: ROUTER_ABI,
+        functionName: "getFulfilledTransfers",
+        args: []
+    }
+}
+
 export type AaveV3SupplyParams = {
     asset: Address,
     amount: bigint,
@@ -262,33 +271,86 @@ export function createAaveV3SupplyHookCallData(params: AaveV3SupplyParams): Hex 
 }
 
 /**
- * Returns an array with two post hooks for Aave V3 supply:
- * 1. ERC20 approve for the AaveV3 Pool contract (uses createERC20ApproveHookCallData).
- * 2. Aave V3 Pool supply call (uses createAaveV3SupplyHookCallData).
- *
- * @param params - Parameters for the supply and approval hook.
- * @param aaveV3PoolAddress - Target address for Aave V3 Pool contract.
- * @param gasLimit - Optional gas limit for each hook. Defaults to 100000.
- * @returns Array with two hook objects.
+ * Validates that an address is a contract (not an EOA) and implements the Aave V3 supply function.
+ * 
+ * @param publicClient - Public client to query the contract
+ * @param aaveV3PoolAddress - Address to validate
+ * @throws Error if address is not a contract or doesn't implement the supply function
  */
-export function createAaveV3SupplyHooks(
+export async function validateAaveV3Contract(
+    publicClient: PublicClient,
+    aaveV3PoolAddress: Address
+): Promise<void> {
+    // Check if address is a contract (has bytecode)
+    const bytecode = await publicClient.getBytecode({ address: aaveV3PoolAddress })
+    if (!bytecode || bytecode === "0x") {
+        throw new Error(`Address ${aaveV3PoolAddress} is not a contract (EOA or no code). Aave V3 Pool must be a deployed contract.`)
+    }
+
+    // Check if contract implements the supply function by checking for the function selector in bytecode
+    // The function selector for supply(address,uint256,address,uint16) is the first 4 bytes of keccak256("supply(address,uint256,address,uint16)")
+    // This is: 0x617ba037 (from AAVE_V3_ABI)
+    try {
+        // Encode the function call to get the selector
+        const supplyFunctionData = encodeFunctionData({
+            abi: AAVE_V3_ABI,
+            functionName: "supply",
+            args: [
+                "0x0000000000000000000000000000000000000000" as Address, // dummy asset
+                0n, // dummy amount
+                "0x0000000000000000000000000000000000000000" as Address, // dummy onBehalfOf
+                0 // dummy referralCode
+            ]
+        })
+        
+        // Extract the function selector (first 4 bytes after 0x)
+        const functionSelector = supplyFunctionData.slice(0, 10) // 0x + 4 bytes = 10 chars
+        const selectorBytes = functionSelector.slice(2) // Remove 0x prefix
+        
+        // Check if the function selector exists in the contract bytecode
+        // Convert bytecode to lowercase for case-insensitive comparison
+        if (!bytecode.toLowerCase().includes(selectorBytes.toLowerCase())) {
+            throw new Error(`Contract at ${aaveV3PoolAddress} does not implement the Aave V3 supply function. Function selector ${functionSelector} not found in contract bytecode.`)
+        }
+    } catch (error) {
+        if (error instanceof Error && error.message.includes("does not implement")) {
+            throw error
+        }
+        throw new Error(`Failed to validate Aave V3 supply function at ${aaveV3PoolAddress}: ${(error as Error).message}`)
+    }
+}
+
+/**
+ * Creates a complete Aave V3 supply hook for use in preHooks or postHooks.
+ * This only creates the supply hook - approve hook should be created separately.
+ *
+ * @param params - Parameters for the Aave V3 supply function
+ * @param aaveV3PoolAddress - Target address for Aave V3 Pool contract
+ * @param gasLimit - Optional gas limit for the hook. Defaults to 100000.
+ * @param publicClient - Public client to validate the contract address. Required - validates that the address is a contract and implements the supply function.
+ * @returns Hook object for Aave V3 supply
+ * @throws Error if publicClient is not provided or validation fails
+ */
+export async function createAaveV3SupplyHook(
     params: AaveV3SupplyParams,
     aaveV3PoolAddress: Address,
-    gasLimit?: bigint
-): Hook[] {
+    gasLimit?: bigint,
+    publicClient?: PublicClient
+): Promise<Hook> {
+    // Validate that publicClient is provided
+    if (!publicClient) {
+        throw new Error("publicClient is required for createAaveV3SupplyHook to validate the Aave V3 contract address")
+    }
+
+    // Validate contract
+    await validateAaveV3Contract(publicClient, aaveV3PoolAddress)
+
     const hookGasLimit = gasLimit ?? 100_000n
-    return [
-        {
-            target: params.asset,
-            callData: createERC20ApproveHookCallData(aaveV3PoolAddress, params.amount),
-            gasLimit: hookGasLimit,
-        },
-        {
-            target: aaveV3PoolAddress,
-            callData: createAaveV3SupplyHookCallData(params),
-            gasLimit: hookGasLimit,
-        }
-    ]
+    return {
+        target: aaveV3PoolAddress,
+        callData: createAaveV3SupplyHookCallData(params),
+        gasLimit: hookGasLimit,
+    }
 }
 
 /**

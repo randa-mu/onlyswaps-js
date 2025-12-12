@@ -9,6 +9,7 @@ import {
     createUpdateFeesCall,
     createRelayTokensCall,
     createGetSwapRequestIdCall,
+    createGetFulfilledTransfersCall,
     OnlySwapsConfig
 } from "./calls"
 import { parseSwapRequest } from "./parser"
@@ -157,6 +158,11 @@ export class RouterClient {
             postHooks: params.postHooks || [],
         })
         return await this.backend.sendTransaction(relayCall)
+    }
+
+    async getFulfilledTransfers(): Promise<Hex[]> {
+        const result = await this.backend.staticCall(createGetFulfilledTransfersCall(this.config))
+        return result as Hex[]
     }
 
 }

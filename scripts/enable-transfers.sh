@@ -26,14 +26,3 @@ cast send "$ROUTER_ADDRESS" "permitDestinationChainId(uint256)" "$2" --rpc-url "
 # enables transfers for the default RUSD ERC-20 token address
 echo "[+] enabling token for $1"
 cast send "$ROUTER_ADDRESS" "setTokenMapping(uint256, address, address)" "$2" "$RUSD_ADDRESS" "$RUSD_ADDRESS" --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" > /dev/null
-
-# Deploy MockAaveV3 contract for integration tests
-echo "[+] deploying MockAaveV3 contract"
-cd $SCRIPT_DIR/../onlyswaps-solidity
-
-# Build contracts first to ensure MockAaveV3 is compiled
-forge build --contracts src/mocks/MockAaveV3.sol > /dev/null 2>&1
-
-# Deploy MockAaveV3 and capture the address
-MOCK_AAVE_V3_ADDRESS=$(forge create src/mocks/MockAaveV3.sol:MockAaveV3 --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" --broadcast --json | jq -r '.deployedTo')
-echo "MOCK_AAVE_V3_ADDRESS IS $MOCK_AAVE_V3_ADDRESS"
