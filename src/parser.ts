@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { Address, isAddress } from "viem"
-import { SwapRequest } from "./model"
+import { Address, Hex, isAddress, isHex } from "viem"
+import { SwapRequest, Hook } from "./model"
 
 export function parseSwapRequest(request: unknown | SwapRequest): SwapRequest {
     const parsed = swapRequestSchema.parse(request)
@@ -18,6 +18,8 @@ export function parseSwapRequest(request: unknown | SwapRequest): SwapRequest {
         amountToApprove,
         srcToken: parsed.srcToken,
         destToken: parsed.destToken,
+        preHooks: parsed.preHooks,
+        postHooks: parsed.postHooks,
     }
 }
 
@@ -35,14 +37,27 @@ const bigintStringSchema = z
     ])
     .transform((val) => BigInt(val))
 
+const hexSchema = z
+    .string()
+    .refine((val) => isHex(val), { message: "Invalid hex string" })
+    .transform((val) => val as Hex)
+
+const hookSchema = z.object({
+    target: addressSchema,
+    callData: hexSchema,
+    gasLimit: bigintStringSchema,
+})
+
 // this allows number, bigint and strings (that look like bigints)
 const swapRequestSchema = z.object({
     recipient: addressSchema,
     srcToken: addressSchema,
     destToken: addressSchema,
-    amountToApprove: bigintStringSchema,
+    amountToApprove: bigintStringSchema.optional(),
     amountIn: bigintStringSchema,
     amountOut: bigintStringSchema,
     fee: bigintStringSchema,
     destChainId: bigintStringSchema,
+    preHooks: z.array(hookSchema).optional(),
+    postHooks: z.array(hookSchema).optional(),
 })

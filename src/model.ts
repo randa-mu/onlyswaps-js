@@ -1,6 +1,12 @@
 import { Abi, Address, ContractFunctionName, Hex, ReadContractReturnType, } from "viem"
 import { EncodedCall } from "./calls"
 
+export type Hook = {
+    target: Address
+    callData: Hex
+    gasLimit: bigint
+}
+
 export type SwapRequest = {
     recipient: Address
     destChainId: bigint
@@ -10,6 +16,8 @@ export type SwapRequest = {
     fee: bigint
     srcToken: Address
     destToken: Address
+    preHooks?: Hook[]
+    postHooks?: Hook[]
 }
 
 export type SwapResponse = {

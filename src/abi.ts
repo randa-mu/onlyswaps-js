@@ -221,6 +221,12 @@ export const ROUTER_ABI = [{
     "stateMutability": "view",
     "type": "function"
 }, {
+    "inputs": [],
+    "name": "hookExecutor",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
     "inputs": [{
         "components": [{ "internalType": "address", "name": "sender", "type": "address" }, {
             "internalType": "address",
@@ -1794,6 +1800,31 @@ export const FAUCET_ABI = [
             }
         ],
         "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+] as const
+export const AAVE_V3_ABI = [
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "onBehalfOf", "type": "address" },
+            { "indexed": false, "internalType": "uint16", "name": "referralCode", "type": "uint16" }
+        ],
+        "name": "Supplied",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "asset", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "address", "name": "onBehalfOf", "type": "address" },
+            { "internalType": "uint16", "name": "referralCode", "type": "uint16" }
+        ],
+        "name": "supply",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
