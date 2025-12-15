@@ -1,4 +1,4 @@
-import { Abi, Address, ContractFunctionArgs, ContractFunctionName, encodeFunctionData, erc20Abi, Hex, PublicClient } from "viem"
+import { Abi, Address, ContractFunctionArgs, ContractFunctionName, encodeFunctionData, erc20Abi, Hex, PublicClient, zeroAddress } from "viem"
 import { FAUCET_ABI, AAVE_V3_ABI, ROUTER_ABI } from "./abi"
 
 import { SwapRequest, type Hook } from "./model"
@@ -111,9 +111,9 @@ export function createGetHookExecutorCall(config: OnlySwapsConfig): EncodedCall<
     return {
         address: config.routerAddress,
         abi: ROUTER_ABI,
-        functionName: "hookExecutor" as any,
+        functionName: "hookExecutor",
         args: []
-    } as EncodedCall<typeof ROUTER_ABI, "hookExecutor">
+    }
 }
 
 type GetSwapRequestIdParams = {
@@ -296,9 +296,9 @@ export async function validateAaveV3Contract(
             abi: AAVE_V3_ABI,
             functionName: "supply",
             args: [
-                "0x0000000000000000000000000000000000000000" as Address, // dummy asset
+                zeroAddress, // dummy asset
                 0n, // dummy amount
-                "0x0000000000000000000000000000000000000000" as Address, // dummy onBehalfOf
+                zeroAddress, // dummy onBehalfOf
                 0 // dummy referralCode
             ]
         })
@@ -326,22 +326,17 @@ export async function validateAaveV3Contract(
  *
  * @param params - Parameters for the Aave V3 supply function
  * @param aaveV3PoolAddress - Target address for Aave V3 Pool contract
+ * @param publicClient - Public client to validate the contract address. Validates that the address is a contract and implements the supply function.
  * @param gasLimit - Optional gas limit for the hook. Defaults to 100000.
- * @param publicClient - Public client to validate the contract address. Required - validates that the address is a contract and implements the supply function.
  * @returns Hook object for Aave V3 supply
- * @throws Error if publicClient is not provided or validation fails
+ * @throws Error if validation fails
  */
 export async function createAaveV3SupplyHook(
     params: AaveV3SupplyParams,
     aaveV3PoolAddress: Address,
-    gasLimit?: bigint,
-    publicClient?: PublicClient
+    publicClient: PublicClient,
+    gasLimit?: bigint
 ): Promise<Hook> {
-    // Validate that publicClient is provided
-    if (!publicClient) {
-        throw new Error("publicClient is required for createAaveV3SupplyHook to validate the Aave V3 contract address")
-    }
-
     // Validate contract
     await validateAaveV3Contract(publicClient, aaveV3PoolAddress)
 

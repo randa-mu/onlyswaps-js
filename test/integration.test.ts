@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals"
-import { createPublicClient, createWalletClient, http, Address, Hex, keccak256, encodeAbiParameters, parseEventLogs, parseAbi, parseEther } from "viem"
+import { createPublicClient, createWalletClient, http, Address, Hex, keccak256, encodeAbiParameters, parseEventLogs, parseAbi, zeroAddress, parseEther } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { avalancheFuji, baseSepolia, foundry } from "viem/chains"
 import {
@@ -26,18 +26,17 @@ import type { Hook } from "../src/model"
 // Address:     0x2602A1971CA485EF1026d0a06A30AAB3B847e78A
 // Private key: 0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301
 // account funded with 10 ETH in scripts/deploy-anvil.sh
-const MY_ADDRESS = "0x2602A1971CA485EF1026d0a06A30AAB3B847e78A" as Address
+const MY_ADDRESS: Address = "0x2602A1971CA485EF1026d0a06A30AAB3B847e78A"
 const account = privateKeyToAccount("0xa5bdd3629c86f0dc2ceaacc30482101b77dce8d608a9aeb55aa216fb41c3b301")
 
 // Solver account (using default Anvil account #0 for relayTokens testing)
 // Address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 // Private key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-const SOLVER_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" as Address
+const SOLVER_ADDRESS: Address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 const solverAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
 
 // Test configuration constants
 const RPC_URL = "http://localhost:31337"
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as Address
 const DEFAULT_AMOUNT_IN = 100n
 const DEFAULT_AMOUNT_OUT = 100n
 const DEFAULT_AMOUNT_TO_APPROVE = 101n
@@ -45,14 +44,12 @@ const DEFAULT_FEE = 1n
 const UPDATED_FEE = 2n
 const DEST_CHAIN_ID = 31338n
 const DEFAULT_GAS_LIMIT = 100_000n
-const TEST_AMOUNT_1_ETH = 1000n * 10n ** 18n // 1000 ETH in wei
-
-const RUSD_ADDRESS = "0x13a6618E42AFb5b700534535B113eb013B746977" as Address
-const ONLYSWAPS_ROUTER_ADDRESS = "0xE16716C8210D8C9e8B8C756e70558d049f8EAcA1" as Address
+const TEST_AMOUNT_1000_ETH = parseEther("1000")
+const RUSD_ADDRESS: Address = "0x13a6618E42AFb5b700534535B113eb013B746977"
+const ONLYSWAPS_ROUTER_ADDRESS: Address = "0xE16716C8210D8C9e8B8C756e70558d049f8EAcA1"
 const PREHOOK_APPROVAL_AMOUNT = 1n
 
 // MockAaveV3 will be deployed fresh for each test that needs it
-
 // MockAaveV3 bytecode (from onlyswaps-solidity/src/mocks/MockAaveV3.sol)
 // This should be updated if the contract is recompiled
 const MOCK_AAVE_V3_BYTECODE = "0x60808060405234601557610297908161001b8239f35b600080fdfe608080604052600436101561001357600080fd5b60003560e01c63617ba0371461002857600080fd5b3461025c57608036600319011261025c576004356001600160a01b0381169081900361025c576044356001600160a01b03811692602435929184900361025c576064359061ffff821680920361025c57821561022a575082156101f05783156101b6576040516323b872dd60e01b8152336004820152306024820152604481018490526020816064816000875af19081156101aa5760009161013f575b5015610108577fbc1106253c048849439055f47b49a5131462058bb8b62bcf9e7d067df7e54a2493608093604051938452602084015260408301526060820152a1005b60405162461bcd60e51b815260206004820152600f60248201526e151c985b9cd9995c8819985a5b1959608a1b6044820152606490fd5b60203d6020116101a3575b601f8101601f191682016001600160401b0381118382101761018f5760209183916040528101031261018b57519081151582036101885750386100c5565b80fd5b5080fd5b634e487b7160e01b84526041600452602484fd5b503d61014a565b6040513d6000823e3d90fd5b60405162461bcd60e51b815260206004820152601260248201527124b73b30b634b21037b72132b430b63327b360711b6044820152606490fd5b60405162461bcd60e51b81526020600482015260126024820152710416d6f756e74206d757374206265203e20360741b6044820152606490fd5b62461bcd60e51b815260206004820152600d60248201526c125b9d985b1a5908185cdcd95d609a1b6044820152606490fd5b600080fdfea264697066735822122068594191c464ca7ad044d1ce1029237cd5c190ce49cdc2d4468d211f2090673264736f6c634300081e0033" as Hex
@@ -152,7 +149,7 @@ test("can fetch recommended fees from the API", async () => {
         destinationToken: AVAX_FUJI.RUSD_ADDRESS,
         sourceChainId: BigInt(baseSepolia.id),
         destinationChainId: BigInt(avalancheFuji.id),
-        amount: TEST_AMOUNT_1_ETH
+        amount: TEST_AMOUNT_1000_ETH
     }
     const result = await fetchRecommendedFees(params)
     expect(result.src.swapFee).toBeGreaterThan(0n)
@@ -225,7 +222,7 @@ test("swap with only postHooks - recipient must be hook executor on destination 
 
     // Get hook executor address (on destination chain - for cross-chain swaps this should be the hook executor on dest chain)
     const hookExecutor = await onlyswaps.getHookExecutor()
-    expect(hookExecutor).not.toBe(ZERO_ADDRESS)
+    expect(hookExecutor).not.toBe(zeroAddress)
 
     const { requestId, transactionHash } = await onlyswaps.swap({
         // For postHooks, recipient must be the hook executor on the destination chain
@@ -245,7 +242,7 @@ test("swap with only postHooks - recipient must be hook executor on destination 
                 amount: DEFAULT_AMOUNT_OUT,
                 onBehalfOf: MY_ADDRESS,
                 referralCode: 0
-            }, MOCK_AAVE_V3_ADDRESS, DEFAULT_GAS_LIMIT, publicClient)
+            }, MOCK_AAVE_V3_ADDRESS, publicClient, DEFAULT_GAS_LIMIT)
         ]
     })
 
@@ -276,7 +273,7 @@ test("swap with both preHooks and postHooks - recipient should be hook executor 
 
     // Get hook executor address (on destination chain - for cross-chain swaps this should be the hook executor on dest chain)
     const hookExecutor = await onlyswaps.getHookExecutor()
-    expect(hookExecutor).not.toBe(ZERO_ADDRESS)
+    expect(hookExecutor).not.toBe(zeroAddress)
 
     const { requestId, transactionHash } = await onlyswaps.swap({
         // For postHooks, recipient must be the hook executor on the destination chain
@@ -299,7 +296,7 @@ test("swap with both preHooks and postHooks - recipient should be hook executor 
                 amount: DEFAULT_AMOUNT_OUT,
                 onBehalfOf: MY_ADDRESS,
                 referralCode: 0
-            }, MOCK_AAVE_V3_ADDRESS, DEFAULT_GAS_LIMIT, publicClient)
+            }, MOCK_AAVE_V3_ADDRESS, publicClient, DEFAULT_GAS_LIMIT)
         ]
     })
 
@@ -330,7 +327,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
 
     // Get hook executor address from the solver's router contract (destination chain where relay happens)
     const hookExecutor = await solverOnlyswaps.getHookExecutor()
-    expect(hookExecutor).not.toBe(ZERO_ADDRESS)
+    expect(hookExecutor).not.toBe(zeroAddress)
     expect(hookExecutor).not.toBe("0x0000000000000000000000000000000000000000")
     
     // Verify the deployed MockAaveV3 contract
@@ -369,7 +366,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
             amount: amount,
             onBehalfOf: MY_ADDRESS,
             referralCode: 0
-        }, actualMockAaveAddress, 10_000_000n, publicClient)
+        }, actualMockAaveAddress, publicClient, 10_000_000n)
     ]
     
 
@@ -465,7 +462,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
     })
     
     // Verify hook executor is set and not zero before relaying
-    expect(hookExecutor).not.toBe(ZERO_ADDRESS)
+    expect(hookExecutor).not.toBe(zeroAddress)
     expect(hookExecutor.toLowerCase()).not.toBe("0x0000000000000000000000000000000000000000")
     
     // Relay tokens with post hooks (use original postHooks - they should already have callData)
@@ -713,7 +710,7 @@ test("should relay tokens with two approve post hooks and verify both approvals 
 
     // Get hook executor address from the solver's router contract
     const hookExecutor = await solverOnlyswaps.getHookExecutor()
-    expect(hookExecutor).not.toBe(ZERO_ADDRESS)
+    expect(hookExecutor).not.toBe(zeroAddress)
     
     // Verify the deployed MockAaveV3 contract
     const mockAaveCode = await publicClient.getBytecode({ address: actualMockAaveAddress })
@@ -875,7 +872,7 @@ test("should relay tokens with two approve post hooks and verify both approvals 
 
 test("validateAaveV3Contract should reject zero address", async () => {
     await expect(
-        validateAaveV3Contract(publicClient, ZERO_ADDRESS)
+        validateAaveV3Contract(publicClient, zeroAddress)
     ).rejects.toThrow("is not a contract (EOA or no code)")
 })
 

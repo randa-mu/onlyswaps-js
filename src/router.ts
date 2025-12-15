@@ -62,7 +62,8 @@ export class RouterClient {
     }
 
     async getHookExecutor(): Promise<Address> {
-        const hookExecutor = await this.backend.staticCall(createGetHookExecutorCall(this.config))
+        const call = createGetHookExecutorCall(this.config)
+        const hookExecutor = await this.backend.staticCall(call)
         return hookExecutor as Address
     }
 
