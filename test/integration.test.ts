@@ -328,7 +328,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
     // Get hook executor address from the solver's router contract (destination chain where relay happens)
     const hookExecutor = await solverOnlyswaps.getHookExecutor()
     expect(hookExecutor).not.toBe(zeroAddress)
-    expect(hookExecutor).not.toBe("0x0000000000000000000000000000000000000000")
+    expect(hookExecutor).not.toBe(zeroAddress)
     
     // Verify the deployed MockAaveV3 contract
     const mockAaveCode = await publicClient.getBytecode({ address: actualMockAaveAddress })
@@ -463,7 +463,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
     
     // Verify hook executor is set and not zero before relaying
     expect(hookExecutor).not.toBe(zeroAddress)
-    expect(hookExecutor.toLowerCase()).not.toBe("0x0000000000000000000000000000000000000000")
+    expect(hookExecutor.toLowerCase()).not.toBe(zeroAddress)
     
     // Relay tokens with post hooks (use original postHooks - they should already have callData)
     const relayReceipt = await solverOnlyswaps.relayTokens({
@@ -538,6 +538,11 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
     
     const approveHookExecuted = hookExecutedEvents.find(e => e.args.target.toLowerCase() === approveHookTarget)
     const supplyHookExecuted = hookExecutedEvents.find(e => e.args.target.toLowerCase() === supplyHookTarget)
+    
+    // Verify the approve hook executed successfully
+    if (!approveHookExecuted || !approveHookExecuted.args.success) {
+        throw new Error(`Approve hook did not execute successfully. HookExecuted event: ${JSON.stringify(approveHookExecuted)}`)
+    }
     
     // Verify the supply hook target matches MockAaveV3 address
     if (supplyHookTarget.toLowerCase() !== actualMockAaveAddress.toLowerCase()) {
@@ -645,7 +650,7 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
 
     // Check balances immediately after transaction
     // The transaction receipt means it's already mined, so state should be available
-    let hookExecutorBalance = await viemBackend.staticCall(
+    const hookExecutorBalance = await viemBackend.staticCall(
         createBalanceOfCall({ token: RUSD_ADDRESS, wallet: hookExecutor })
     )
     // Hook executor should have 0 tokens after the relay
@@ -653,13 +658,19 @@ test("should relay tokens with Aave V3 post hooks and store a receipt", async ()
     expect(hookExecutorBalance).toBe(0n)
     
     // Check Aave balance after the relay
-    let aaveBalance = await viemBackend.staticCall(
+    const aaveBalance = await viemBackend.staticCall(
         createBalanceOfCall({ token: RUSD_ADDRESS, wallet: actualMockAaveAddress })
     )
     // MockAaveV3 should have received the tokens after the relay
     // Check the balance increase (delta) rather than absolute value
     expect(aaveBalance - aaveBalanceBefore).toBe(amount)
 
+    // Verify recipient balance does not change after Aave supply hook
+    // The tokens go to Aave V3 on behalf of the recipient, not directly to the recipient
+    const recipientBalanceAfter = await viemBackend.staticCall(
+        createBalanceOfCall({ token: RUSD_ADDRESS, wallet: MY_ADDRESS })
+    )
+    expect(recipientBalanceAfter).toBe(recipientBalanceBefore)
 
     // Check swap request receipt
     const swapRequestReceipt = await onlyswaps.fetchFulfilmentReceipt(requestId)
